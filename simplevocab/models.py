@@ -26,7 +26,6 @@ class VocabEntry(models.Model):
     word = models.ForeignKey('Word', on_delete=models.CASCADE, null=False)
     discovery_source = models.CharField(max_length=50)
     last_quiz = models.BooleanField(default=False)
-    etymology = models.CharField(max_length=255)
 
     def __str__(self):
         return "{} ({})".format(self.word, self.user)
