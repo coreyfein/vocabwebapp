@@ -11,9 +11,7 @@ class OwnerListView(ListView):
         print('list get_queryset called')
         """ Limit a User to only viewing their own data. """
         qs = super(OwnerListView, self).get_queryset()
-        return qs.filter(created_by=self.request.user)
-    
-
+        return qs.filter(**{self.field_to_filter_by: self.request.user})
 
 class OwnerDetailView(DetailView):
     """

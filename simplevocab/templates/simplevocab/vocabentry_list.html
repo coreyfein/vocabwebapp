@@ -1,0 +1,24 @@
+
+{% block content %}
+  <h1>Vocab List</h1>
+  {% if vocabentry_list %}
+  <ul>
+    {% for vocabentry in vocabentry_list %}
+      <li>
+          {{ vocabentry.word.word }}
+          (<a href="{% url 'simplevocab:vocabentry_update' word.id %}">Update</a> |
+          <a href="{% url 'simplevocab:vocabentry_delete' word.id %}">Delete</a>) <br/>
+          Definition: {{ vocabentry.word.definition }}<br/>
+          Synonyms: {{ vocabentry.word.synonyms }}<br/>
+          Examples: {{ vocabentry.word.examples }}<br/>
+          Etymology: {{ vocabentry.word.etymology }}<br/>
+          Discovery Source: {{ vocabentry.discovery_source }}<br/>
+          In Last Quiz: {{ vocabentry.last_quiz }}<br/>
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>There are no vocab entries for this user.</p>
+  {% endif %}
+
+{% endblock %}

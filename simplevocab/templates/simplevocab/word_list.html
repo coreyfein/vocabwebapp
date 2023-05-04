@@ -8,7 +8,11 @@
           {{ word.word }}
           (<a href="{% url 'simplevocab:word_update' word.id %}">Update</a> |
           <a href="{% url 'simplevocab:word_delete' word.id %}">Delete</a>) <br/>
-          {{ word.definition }} ({{ word.synonyms }})
+          Definition: {{ word.definition }}<br/>
+          Synonyms: {{ word.synonyms }}<br/>
+          Examples: {{ word.examples }}<br/>
+          Etymology: {{ word.etymology }}<br/>
+          Created by: {{ word.created_by }}<br/>
       </li>
     {% endfor %}
   </ul>

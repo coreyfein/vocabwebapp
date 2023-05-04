@@ -27,6 +27,9 @@ class VocabEntry(models.Model):
     discovery_source = models.CharField(max_length=50)
     last_quiz = models.BooleanField(default=False)
     etymology = models.CharField(max_length=255)
+
+    def __str__(self):
+        return "{} ({})".format(self.word, self.user)
     
 class QuizResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
