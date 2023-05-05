@@ -12,6 +12,11 @@ class WordListView(OwnerListView):
 class WordDetailView(OwnerDetailView):
     model = Word
 
+# WordCreateView(OwnerUpdateView) creates a word in the Word table with manually entered word data. 
+# Instead, a new version should just receive a form input with word and discovery_source, 
+# get_or_create a Word record, update the Word record with definitions etc. if just created,
+# and create a VocabEntry record (user, discovery_source, word_id)
+# Standalone script add_vocabentry basically does this, needs to be adapated to a view
 class WordCreateView(OwnerCreateView):
     model = Word
     # List the fields to copy from the Words model to the Word form
