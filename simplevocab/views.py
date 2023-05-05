@@ -24,9 +24,8 @@ class WordCreateView(OwnerCreateView):
 
 class WordUpdateView(OwnerUpdateView):
     model = Word
+    field_to_filter_by = "created_by"
     fields = ['word', 'definition', 'synonyms', 'examples', 'etymology']
-    # This would make more sense
-    # fields_exclude = ['owner', 'created_at', 'updated_at']
 
 class WordDeleteView(OwnerDeleteView):
     model = Word
@@ -40,7 +39,19 @@ class VocabEntryListView(OwnerListView):
 class VocabEntryDetailView(OwnerDetailView):
     model = VocabEntry
 
-class VocabEntryCreateView(OwnerCreateView):
+class VocabEntryUpdateView(OwnerUpdateView):
     model = VocabEntry
-    # List the fields to copy from the Words model to the Word form
-    fields = ['discovery_source', 'last_quiz', 'etymology']
+    template_name_suffix = "_update_form"
+    field_to_filter_by = "user"
+    fields = ['definition_override', 'synonyms_override', 'examples_override', 'etymology_override', 'discovery_source']
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        vocabentry_id = self.kwargs['pk']
+        vocabentry = VocabEntry.objects.get(id=vocabentry_id)
+        word = vocabentry.word.word
+        context['word'] = word
+        return context
+    
+class VocabEntryDeleteView(OwnerDeleteView):
+    model = VocabEntry
+
