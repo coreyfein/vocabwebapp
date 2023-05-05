@@ -13,7 +13,7 @@ class Word(models.Model):
     synonyms = models.CharField(max_length=255)
     examples = models.CharField(max_length=255)
     etymology = models.CharField(max_length=255)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)#should maybe remove null=True eventually
 
     # Shows up in the admin list
     def __str__(self):
@@ -22,7 +22,7 @@ class Word(models.Model):
 class VocabEntry(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)#should maybe remove null=True eventually
     word = models.ForeignKey('Word', on_delete=models.CASCADE, null=False)
     discovery_source = models.CharField(max_length=50)
     last_quiz = models.BooleanField(default=False)
