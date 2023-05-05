@@ -44,7 +44,7 @@ class OwnerUpdateView(LoginRequiredMixin, UpdateView):
         print('update get_queryset called')
         """ Limit a User to only modifying their own data. """
         qs = super(OwnerUpdateView, self).get_queryset()
-        return qs.filter(created_by=self.request.user)
+        return qs.filter(**{self.field_to_filter_by: self.request.user})
 
 
 class OwnerDeleteView(LoginRequiredMixin, DeleteView):
