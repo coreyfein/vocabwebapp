@@ -6,23 +6,23 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-def run():
-    word_input = input("Word: >")
-    discovery_source_input = input("discovery_source: >")
-    
+def run(word_input, discovery_source_input, user):    
     lemma = get_lemma_for_word(word_input)
     w, created = Word.objects.get_or_create(word__iexact=lemma)
     print("word id: " + str(w.id))
+    print("Created: {}".format(created))
     if created:
         word, definition_string, synonyms_string, examples_string, etymology = get_dictionary_data(lemma)
         # when triggered by a form, also pass in user to the created_by field in new Word record
-        w.definition=definition_string
-        w.synonyms=synonyms_string
-        w.examples=examples_string
-        w.etymology=etymology
+        w.created_by = user
+        w.word = word
+        w.definition = definition_string
+        w.synonyms = synonyms_string
+        w.examples = examples_string
+        w.etymology = etymology
         w.save()
     # when triggered by a form, also pass in user to the user field in new VocabEntry record
-    v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input)
+    v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
 
 def get_lemma_for_word(word):
     lemma = word # just passing it through for now, until OED API is working

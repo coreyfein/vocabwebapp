@@ -16,6 +16,8 @@ urlpatterns = [
         views.VocabEntryUpdateView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocabentry_update'),
     path('vocabentry/<int:pk>/delete',
         views.VocabEntryDeleteView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocabentry_delete'),
+    path('vocabentry/create',
+        views.VocabEntryCreateView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocabentry_create'),
 ]
 
 # We use reverse_lazy in urls.py to delay looking up the view until all the paths are defined

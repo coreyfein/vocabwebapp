@@ -2,6 +2,7 @@
 {% block content %}
   <h1>Vocab List</h1>
   {% if vocabentry_list %}
+  <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
   <ul>
     {% for vocabentry in vocabentry_list %}
       <li>

@@ -1,6 +1,9 @@
 from simplevocab.models import Word, VocabEntry
 from simplevocab.owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
-
+from simplevocab.forms import VocabEntryUserInputForm
+from django.views.generic.edit import FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from scripts import add_vocabentry
 
 class WordListView(OwnerListView):
     model = Word
@@ -54,4 +57,23 @@ class VocabEntryUpdateView(OwnerUpdateView):
     
 class VocabEntryDeleteView(OwnerDeleteView):
     model = VocabEntry
+
+class VocabEntryCreateView(LoginRequiredMixin, FormView):
+    template_name = "simplevocab/vocabentry_user_input.html"
+    # form=VocabEntryUserInputForm(request.POST or None)
+    # if form.is_valid():
+    #     word = form.cleaned_data["word"]
+    #     discovery_source = form.cleaned_data["discovery_source"]
+    #     add_vocabentry.run(word, discovery_source)
+    form_class = VocabEntryUserInputForm
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        word = form.cleaned_data["word"]
+        discovery_source = form.cleaned_data["discovery_source"]
+        user = self.request.user
+        add_vocabentry.run(word, discovery_source, user)
+        return super().form_valid(form)
+    
+        
 
