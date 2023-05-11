@@ -66,6 +66,10 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
     #     discovery_source = form.cleaned_data["discovery_source"]
     #     add_vocabentry.run(word, discovery_source)
     form_class = VocabEntryUserInputForm
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["word"] = self.request.GET["word"]
+        return initial
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
