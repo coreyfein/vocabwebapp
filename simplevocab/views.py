@@ -60,11 +60,6 @@ class VocabEntryDeleteView(OwnerDeleteView):
 
 class VocabEntryCreateView(LoginRequiredMixin, FormView):
     template_name = "simplevocab/vocabentry_user_input.html"
-    # form=VocabEntryUserInputForm(request.POST or None)
-    # if form.is_valid():
-    #     word = form.cleaned_data["word"]
-    #     discovery_source = form.cleaned_data["discovery_source"]
-    #     add_vocabentry.run(word, discovery_source)
     form_class = VocabEntryUserInputForm
     def get_initial(self):
         initial = super().get_initial()
