@@ -24,8 +24,13 @@ def run(word_input, discovery_source_input, user):
         w.examples = examples_string
         w.etymology = etymology
         w.save()
-    # when triggered by a form, also pass in user to the user field in new VocabEntry record
-    v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
+        v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
+    else:
+        try:
+            v = VocabEntry.objects.get(word__word__iexact=word_input)
+            print("VocabEntry with that word exists already")# Would be better to surface a message or change the redirect, but for now this just redirects normally without adding the word
+        except:
+            v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
 
 def get_lemma_for_word(word):
     lemma = word # just passing it through for now, until OED API is working
