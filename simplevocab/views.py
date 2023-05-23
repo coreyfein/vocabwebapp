@@ -57,6 +57,7 @@ class VocabEntryUpdateView(OwnerUpdateView):
     
 class VocabEntryDeleteView(OwnerDeleteView):
     model = VocabEntry
+    field_to_filter_by = "user"
 
 class VocabEntryCreateView(LoginRequiredMixin, FormView):
     template_name = "simplevocab/vocabentry_user_input.html"

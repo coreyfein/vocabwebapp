@@ -56,7 +56,7 @@ class OwnerDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         print('delete get_queryset called')
         qs = super(OwnerDeleteView, self).get_queryset()
-        return qs.filter(created_by=self.request.user)
+        return qs.filter(**{self.field_to_filter_by: self.request.user})
 
 # References
 
