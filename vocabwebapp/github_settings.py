@@ -20,9 +20,8 @@ load_dotenv()
 
 # Then copy the client_key and secret to this file
 
-SOCIAL_AUTH_GITHUB_KEY = os.environ[SOCIAL_AUTH_GITHUB_KEY]
-SOCIAL_AUTH_GITHUB_SECRET = os.environ[SOCIAL_AUTH_GITHUB_SECRET]
-
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('SOCIAL_AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('SOCIAL_AUTH_GITHUB_SECRET')
 # Ask for the user's email (don't edit this line)
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 

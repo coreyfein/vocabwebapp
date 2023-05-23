@@ -30,8 +30,8 @@ def run(word_input, discovery_source_input, user):
 def get_lemma_for_word(word):
     lemma = word # just passing it through for now, until OED API is working
     # oed_base_url = 'https://od-api.oxforddictionaries.com/api/v2'
-    # OED_APPLICATION_ID = os.environ['OED_APPLICATION_ID']
-    # OED_APPLICATION_KEY = os.environ['OED_APPLICATION_KEY']
+    # OED_APPLICATION_ID = os.getenv('OED_APPLICATION_ID')
+    # OED_APPLICATION_KEY = os.getenv('OED_APPLICATION_KEY')
     # headers = {'app_id':OED_APPLICATION_ID, 'app_key':OED_APPLICATION_KEY}
     # lemmas_url = '{}/lemmas/en/{}'.format(oed_base_url, word.lower())
     # lemmas_response = requests.get(lemmas_url, headers=headers)
@@ -119,7 +119,7 @@ def get_dictionary_data(word):
     return dictionary_data
 
 def get_webster_dictionary_data(word):
-    MERRIAM_WEBSTER_DICTIONARY_KEY = os.environ["MERRIAM_WEBSTER_DICTIONARY_KEY"]
+    MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
     url = "https://dictionaryapi.com/api/v3/references/collegiate/json/{}?key={}".format(word, MERRIAM_WEBSTER_DICTIONARY_KEY)
     response = requests.get(url)
     response_content_str = response.content.decode()
