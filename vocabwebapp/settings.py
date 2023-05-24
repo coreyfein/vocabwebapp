@@ -50,13 +50,14 @@ INSTALLED_APPS = [
     #Extensions
     'django_extensions',
     'crispy_forms',
+    'crispy_bootstrap4',
     'rest_framework',
     'social_django',
     'taggit',
 ]
 
-# When we get to crispy forms :)
-CRISPY_TEMPLATE_PACK = 'bootstrap4'  # Add
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # When we get to tagging
 TAGGIT_CASE_INSENSITIVE = True
