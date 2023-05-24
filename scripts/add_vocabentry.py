@@ -26,11 +26,9 @@ def run(word_input, discovery_source_input, user):
         w.save()
         v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
     else:
-        try:
-            v = VocabEntry.objects.get(word__word__iexact=word_input)
+        v, created = VocabEntry.objects.get_or_create(word=w.id)
+        if not created:
             print("VocabEntry with that word exists already")# Would be better to surface a message or change the redirect, but for now this just redirects normally without adding the word
-        except:
-            v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
 
 def get_lemma_for_word(word):
     lemma = word # just passing it through for now, until OED API is working
