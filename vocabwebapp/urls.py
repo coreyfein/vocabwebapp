@@ -27,6 +27,7 @@ urlpatterns = [
     path('simplevocab/', include('simplevocab.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('logout', auth_views.LogoutView.as_view(template_name='registration/logout.html'), name='logout'),
     re_path(r'^oauth/', include('social_django.urls', namespace='social')),
 ]
 
@@ -45,7 +46,7 @@ try:
     from . import github_settings
     social_login = 'registration/login_social.html'
     urlpatterns.insert(0,
-                       path('accounts/login/', auth_views.LoginView.as_view(template_name=social_login))
+                       path('accounts/login/', auth_views.LoginView.as_view(template_name=social_login), name='social_login')
                        )
     print('Using', social_login, 'as the login template')
 except:
