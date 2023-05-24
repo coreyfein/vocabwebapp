@@ -134,29 +134,35 @@ def get_webster_dictionary_data(word):
     word = word_dict["meta"]["id"].split(":")[0]
     part_of_speech = word_dict["fl"]
     senses = word_dict["def"][0]["sseq"]
-    definition = ""
+    definitions = []
+    definition_string = ""
+    examples = []
+    examples_string = ""
     print(len(senses))
-    for count, sense in enumerate(senses):
-        if definition != "":
-            print(len(definition))
-            continue
-        else:
-            print("trying sense {}".format(count))
-        sense_dict = sense[0][1]
-        definition_list = sense_dict["dt"]
-        synonyms_string = ""
-        examples_string = ""
-        etymology = ""
-        for component in definition_list:
-            if component[0] == "text":
-                definition = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-            if component[0] == "vis":
-                examples = []
-                for example_dict in component[1]:
-                    example = re.sub(r'{.+?}', '', example_dict["t"])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-                    examples.append(example)
-                examples_string = "; ".join(examples)
-    definition_string = '({}) {}'.format(part_of_speech, definition)
+    for sense_count, sense in enumerate(senses):
+        for sub_sense in sense:
+            print("sub_sense[0]:")
+            print(sub_sense[0])
+            if sub_sense[0] == "sense":
+                sense_dict = sub_sense[1]
+            elif sub_sense[0] == "bs":
+                sense_dict = sub_sense[1]["sense"]
+            elif sub_sense[0] == "pseq":
+                continue
+            definition_list = sense_dict["dt"]
+            for component in definition_list:
+                if component[0] == "text":
+                    definition = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+                    if len(definitions) <= 5:
+                        definitions.append(definition)
+                if component[0] == "vis":
+                    for example_dict in component[1]:
+                        example = re.sub(r'{.+?}', '', example_dict["t"])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+                        examples.append(example)
+    examples_string = "; ".join(examples)
+    definition_string = "; ".join(definitions)
+    definition_string = '({}) {}'.format(part_of_speech, definition_string)
+    synonyms_string = ""
     syns = word_dict.get("syns")
     if not syns:
         # print("No synonyms found")
@@ -168,7 +174,7 @@ def get_webster_dictionary_data(word):
             if component == "text":
                 synonyms_string = synonyms_list[count + 1].replace("{/sc} {sc}", ", ").replace("{/sc}", "")
                 synonyms_string = re.sub(r'{.+?}', '', synonyms_string)# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-    
+    etymology = ""
     etymology_list = word_dict.get("et")
     for component in etymology_list:
         if component[0] == "text":
