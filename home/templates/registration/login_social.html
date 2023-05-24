@@ -31,6 +31,13 @@
     Login with GitHub</a>
 {% endif %}
 
+{% if settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY %}
+<hr/>
+<a class="btn btn-info" role="button" href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
+    <i class="fa fa-google" aria-hidden="true"></i>
+    Login with Google</a>
+{% endif %}
+
 <!-- ROOT_URLCONF {{ settings.ROOT_URLCONF }} -->
 
 {% endblock %}
