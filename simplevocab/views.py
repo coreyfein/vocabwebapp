@@ -48,7 +48,7 @@ class VocabEntryUpdateView(OwnerUpdateView):
     model = VocabEntry
     template_name_suffix = "_update_form"
     field_to_filter_by = "user"
-    fields = ['definition_override', 'synonyms_override', 'examples_override', 'etymology_override', 'discovery_source']
+    fields = ['definition_override', 'synonyms_override', 'examples_override', 'etymology_override', 'discovery_source', 'discovery_context']
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         vocabentry_id = self.kwargs['pk']
@@ -68,6 +68,7 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
         initial = super().get_initial()
         initial["word"] = self.request.GET.get("word")
         initial["discovery_source"] = self.request.GET.get("discovery_source")
+        initial["discovery_context"] = self.request.GET.get("discovery_context")
         return initial
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
@@ -98,11 +99,12 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
         for row, item in enumerate(dict_reader, start=1):
             word = item.get("word")
             discovery_source = item.get("discovery_source", "Uploaded from previous vocab list")
+            discovery_context = item.get("discovery_context")
             definition_override = item.get("definition")
             synonyms_override = item.get("synonyms")
             examples_override = item.get("examples")
             etymology_override = item.get("etymology")
-            add_vocabentry.run(word, discovery_source, user, definition_override, synonyms_override, examples_override, etymology_override)
+            add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
 
         return super().form_valid(form)
     

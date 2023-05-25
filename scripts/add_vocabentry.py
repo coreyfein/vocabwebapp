@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-def run(word_input, discovery_source_input, user, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):    
+def run(word_input, discovery_source_input, discovery_context_input, user, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):    
     # lemma = get_lemma_for_word(word_input) #OED version only
     # w, created = Word.objects.get_or_create(word__iexact=lemma) #OED version only
     w, created = Word.objects.get_or_create(word__iexact=word_input)
@@ -24,7 +24,7 @@ def run(word_input, discovery_source_input, user, definition_override=None, syno
         w.examples = examples_string
         w.etymology = etymology
         w.save()
-        v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
+        v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, discovery_context=discovery_context_input, user=user)
     else:
         v, created = VocabEntry.objects.get_or_create(word=w)
         if created:
@@ -38,6 +38,8 @@ def run(word_input, discovery_source_input, user, definition_override=None, syno
                 v.examples_override = examples_override
             if etymology_override:
                 v.etymology_override = etymology_override
+            if discovery_context_input:
+                v.discovery_context = discovery_context_input
             v.save()
         else:
             print("VocabEntry with that word exists already")# Would be better to surface a message or change the redirect, but for now this just redirects normally without adding the word

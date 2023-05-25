@@ -17,19 +17,20 @@
           {% endif %}<br/>
           Synonyms: {% if vocabentry.synonyms_override == "" or not vocabentry.synonyms_override %} 
           {{ vocabentry.word.synonyms }}
-        {% else %}
-          {{ vocabentry.synonyms_override }}
-        {% endif %}<br/>
+          {% else %}
+            {{ vocabentry.synonyms_override }}
+          {% endif %}<br/>
           Examples: {% if vocabentry.examples_override == "" or not vocabentry.examples_override %} 
-          {{ vocabentry.word.examples }}
-        {% else %}
-          {{ vocabentry.examples_override }}
-        {% endif %}<br/>
+            {{ vocabentry.word.examples }}
+          {% else %}
+            {{ vocabentry.examples_override }}
+          {% endif %}<br/>
           Etymology: {% if vocabentry.etymology_override == "" or not vocabentry.etymology_override %} 
-          {{ vocabentry.word.etymology }}
-        {% else %}
-          {{ vocabentry.etymology_override }}
-        {% endif %}<br/>
+            {{ vocabentry.word.etymology }}
+          {% else %}
+            {{ vocabentry.etymology_override }}
+          {% endif %}<br/>
+          Discovery Context: {{ vocabentry.discovery_context }}<br/>
           Discovery Source: {{ vocabentry.discovery_source }}<br/>
           In Last Quiz: {{ vocabentry.last_quiz }}<br/>
       </li>

@@ -30,6 +30,7 @@ class VocabEntry(models.Model):
     synonyms_override = models.CharField(max_length=255, default="", null=True, blank=True)
     examples_override = models.CharField(max_length=255, default="", null=True, blank=True)
     etymology_override = models.CharField(max_length=255, default="", null=True, blank=True)
+    discovery_context = models.CharField(max_length=255, default="", null=True, blank=True)
 
     def __str__(self):
         return "{} ({})".format(self.word, self.user)
