@@ -1,9 +1,11 @@
 from simplevocab.models import Word, VocabEntry
 from simplevocab.owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
-from simplevocab.forms import VocabEntryUserInputForm
+from simplevocab.forms import VocabEntryUserInputForm, VocabListUploadForm
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from scripts import add_vocabentry
+import csv
+from io import TextIOWrapper
 
 class WordListView(OwnerListView):
     model = Word
@@ -74,6 +76,34 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
         discovery_source = form.cleaned_data["discovery_source"]
         user = self.request.user
         add_vocabentry.run(word, discovery_source, user)
+        return super().form_valid(form)
+    
+class VocabListUploadView(LoginRequiredMixin, FormView):
+    template_name = "simplevocab/vocab_list_upload.html"
+    form_class = VocabListUploadForm
+
+    def form_valid(self, form):
+        user = self.request.user
+        csv_file = form.cleaned_data["file"]
+        f = TextIOWrapper(csv_file.file)
+        dict_reader = csv.DictReader(f)
+        required_columns = ["word"]
+        # Check needed columns exist
+        for req_col in required_columns:
+            if req_col not in dict_reader.fieldnames:
+                raise Exception(
+                    f"A required column is missing from the uploaded CSV: '{req_col}'"
+                )
+
+        for row, item in enumerate(dict_reader, start=1):
+            word = item.get("word")
+            discovery_source = item.get("discovery_source", "Uploaded from previous vocab list")
+            definition_override = item.get("definition")
+            synonyms_override = item.get("synonyms")
+            examples_override = item.get("examples")
+            etymology_override = item.get("etymology")
+            add_vocabentry.run(word, discovery_source, user, definition_override, synonyms_override, examples_override, etymology_override)
+
         return super().form_valid(form)
     
         
