@@ -75,8 +75,9 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
         # It should return an HttpResponse.
         word = form.cleaned_data["word"]
         discovery_source = form.cleaned_data["discovery_source"]
+        discovery_context = form.cleaned_data["discovery_source"]
         user = self.request.user
-        add_vocabentry.run(word, discovery_source, user)
+        add_vocabentry.run(word, discovery_source, discovery_context, user)
         return super().form_valid(form)
     
 class VocabListUploadView(LoginRequiredMixin, FormView):
