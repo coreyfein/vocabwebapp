@@ -1,9 +1,9 @@
 {% extends "base_menu.html" %}
 {% block content %}
   <h1>Vocab List</h1>
-  {% if vocabentry_list %}
   <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
   <p><a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a vocab list</a></p>
+  {% if vocabentry_list %}
   <ul>
     {% for vocabentry in vocabentry_list %}
       <li>
