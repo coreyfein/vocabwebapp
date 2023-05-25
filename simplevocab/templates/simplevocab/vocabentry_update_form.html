@@ -1,18 +1,20 @@
 {% extends "base_menu.html" %}
 
 {% block content %}
+{% load crispy_forms_tags %}
   <form action="" method="post">
     {% csrf_token %}
     {{object.word.word}} <br/>
+    <br/>
     Default data for this word: <br/>
     Definition: {{object.word.definition}} <br/>
     Synonyms: {{object.word.synonyms}} <br/>
     Examples: {{object.word.examples}} <br/>
     Etymology: {{object.word.etymology}} <br/>
-    To override this word's data in your vocab list, enter your own data below and submit:
-    <table>
-    {{ form.as_table }}
-    </table>
+    <br/>
+    To override this word's data in your vocab list, enter your own data below and submit: <br/>
+    <br/>
+    {{ form | crispy }}
     <input type="submit" value="Submit">
     <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
   </form>
