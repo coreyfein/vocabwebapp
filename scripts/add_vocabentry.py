@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-def run(word_input, discovery_source_input, user):    
+def run(word_input, discovery_source_input, user, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):    
     # lemma = get_lemma_for_word(word_input) #OED version only
     # w, created = Word.objects.get_or_create(word__iexact=lemma) #OED version only
     w, created = Word.objects.get_or_create(word__iexact=word_input)
@@ -26,9 +26,22 @@ def run(word_input, discovery_source_input, user):
         w.save()
         v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, user=user)
     else:
-        v, created = VocabEntry.objects.get_or_create(word=w.id)
-        if not created:
+        v, created = VocabEntry.objects.get_or_create(word=w)
+        if created:
+            v.user = user
+            v.discovery_source = discovery_source_input
+            if definition_override:
+                v.definition_override = definition_override
+            if synonyms_override:
+                v.synonyms_override = synonyms_override
+            if examples_override:
+                v.examples_override = examples_override
+            if etymology_override:
+                v.etymology_override = etymology_override
+            v.save()
+        else:
             print("VocabEntry with that word exists already")# Would be better to surface a message or change the redirect, but for now this just redirects normally without adding the word
+        
 
 def get_lemma_for_word(word):
     lemma = word # just passing it through for now, until OED API is working
@@ -173,7 +186,7 @@ def get_webster_dictionary_data(word):
                 synonyms_string = synonyms_list[count + 1].replace("{/sc} {sc}", ", ").replace("{/sc}", "")
                 synonyms_string = re.sub(r'{.+?}', '', synonyms_string)# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
     etymology = ""
-    etymology_list = word_dict.get("et")
+    etymology_list = word_dict.get("et", [])
     for component in etymology_list:
         if component[0] == "text":
             etymology = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
