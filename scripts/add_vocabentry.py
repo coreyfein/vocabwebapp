@@ -138,7 +138,7 @@ def get_dictionary_data(word):
 
 def get_webster_dictionary_data(word):
     MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
-    url = "https://dictionaryapi.com/api/v3/references/collegiate/json/{}?key={}".format(word, MERRIAM_WEBSTER_DICTIONARY_KEY)
+    url = "https://www.dictionaryapi.com/api/v3/references/collegiate/json/{}?key={}".format(word, MERRIAM_WEBSTER_DICTIONARY_KEY)
     response = requests.get(url)
     response_content_str = response.content.decode()
     response_content_list = json.loads(response_content_str)
