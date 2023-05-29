@@ -9,7 +9,7 @@ class Word(models.Model):
         max_length=50,
         null=False
     )
-    definition = models.CharField(max_length=255, null=False)
+    definition = models.CharField(max_length=255)
     synonyms = models.CharField(max_length=255)
     examples = models.CharField(max_length=255)
     etymology = models.CharField(max_length=255)
@@ -39,7 +39,7 @@ class QuizResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    word = models.ForeignKey('Word', on_delete=models.CASCADE, null=False)
+    vocab_entry = models.ForeignKey('VocabEntry', on_delete=models.CASCADE, null=True)
     correct_answer = models.BooleanField(default=False)
 
     def __str__(self):
@@ -47,4 +47,4 @@ class QuizResponse(models.Model):
             self.correct_answer_str = "Correct"
         else:
             self.correct_answer_str = "Incorrect"
-        return "Response for the word '{}' at {}: {}".format(self.word, self.created_at, self.correct_answer_str)
+        return "Response for the word '{}' at {}: {}".format(self.vocab_entry, self.created_at, self.correct_answer_str)
