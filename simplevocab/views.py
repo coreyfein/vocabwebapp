@@ -77,7 +77,8 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
         discovery_source = form.cleaned_data["discovery_source"]
         discovery_context = form.cleaned_data["discovery_context"]
         user = self.request.user
-        add_vocabentry.run(word, discovery_source, discovery_context, user)
+        success = add_vocabentry.run(word, discovery_source, discovery_context, user)
+        #  add functionality to raise an error here (if success == False)
         return super().form_valid(form)
     
 class VocabListUploadView(LoginRequiredMixin, FormView):
@@ -96,7 +97,7 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
                 raise Exception(
                     f"A required column is missing from the uploaded CSV: '{req_col}'"
                 )
-
+        errored_words = []
         for row, item in enumerate(dict_reader, start=1):
             word = item.get("word")
             discovery_source = item.get("discovery_source", "Uploaded from previous vocab list")
@@ -105,7 +106,10 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
             synonyms_override = item.get("synonyms")
             examples_override = item.get("examples")
             etymology_override = item.get("etymology")
-            add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
+            success, error_message = add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
+            if not success:
+                errored_words.append((word, error_message))
+        print("errored_words: {}".format(errored_words))
 
         return super().form_valid(form)
     
