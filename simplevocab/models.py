@@ -43,4 +43,8 @@ class QuizResponse(models.Model):
     correct_answer = models.BooleanField(default=False)
 
     def __str__(self):
-        return "Response for the word '{}' at {}: {}".format(self.word, self.created_at, self.correct_answer)
+        if self.correct_answer == True:
+            self.correct_answer_str = "Correct"
+        else:
+            self.correct_answer_str = "Incorrect"
+        return "Response for the word '{}' at {}: {}".format(self.word, self.created_at, self.correct_answer_str)
