@@ -10,6 +10,7 @@ load_dotenv()
 def run(word_input, discovery_source_input, discovery_context_input, user, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):    
     # lemma = get_lemma_for_word(word_input) #OED version only
     # w, created = Word.objects.get_or_create(word__iexact=lemma) #OED version only
+    error_message = False
     w, created = Word.objects.get_or_create(word__iexact=word_input)
     print("word id: " + str(w.id))
     print("Created: {}".format(created))
@@ -25,6 +26,11 @@ def run(word_input, discovery_source_input, discovery_context_input, user, defin
         w.etymology = etymology
         w.save()
         v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, discovery_context=discovery_context_input, user=user)
+        if definition_string == "":# word is set to an empty string if not found in the dictionary
+            success = False #this is just for returning success variable later, it's okay that we added the word above anyway.
+            error_message = "The word {} could not be found in the dictionary.".format(word)
+        else:
+            success = True
     else:
         v, created = VocabEntry.objects.get_or_create(word=w)
         if created:
@@ -41,9 +47,14 @@ def run(word_input, discovery_source_input, discovery_context_input, user, defin
             if discovery_context_input:
                 v.discovery_context = discovery_context_input
             v.save()
+            success = True
         else:
-            print("VocabEntry with that word exists already")# Would be better to surface a message or change the redirect, but for now this just redirects normally without adding the word
-        
+            success = False
+            error_message = "The word {} already exists in your Vocab List.".format(w.word)
+    print("success: {}".format(success))
+    if not success:
+        print(error_message)
+    return success, error_message
 
 def get_lemma_for_word(word):
     lemma = word # just passing it through for now, until OED API is working
@@ -144,6 +155,9 @@ def get_webster_dictionary_data(word):
     response_content_list = json.loads(response_content_str)
     print(json.dumps(response_content_list, indent=4))
     word_dict = response_content_list[0]
+    if isinstance(word_dict, str):
+        dictionary_data = (word, "", "", "", "")
+        return dictionary_data
     word = word_dict["meta"]["id"].split(":")[0]
     part_of_speech = word_dict["fl"]
     senses = word_dict["def"][0]["sseq"]
