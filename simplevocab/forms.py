@@ -1,6 +1,7 @@
 from django import forms
 from simplevocab.models import Word, VocabEntry
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 class VocabEntryUserInputForm(forms.Form):
     word = forms.CharField(min_length = 1, max_length=Word._meta.get_field("word").max_length)
