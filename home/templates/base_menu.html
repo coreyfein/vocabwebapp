@@ -11,9 +11,9 @@
 
       <!-- Assign output of url function to a variable named
           'xyz' to use in the if statement -->
-      {% url 'simplevocab:all_vocabentries' as xyz %}
-      <li {% if request.get_full_path == xyz %}class="active"{% endif %}>
-          <a href="{% url 'simplevocab:all_vocabentries' %}">Home</a></li>
+      {% url 'simplevocab:quiz' as quiz %}
+      <li {% if request.get_full_path == quiz %}class="active"{% endif %}>
+          <a href="{% url 'simplevocab:quiz' %}">Quiz</a></li>
 
       <li class="dropdown">
       <a href="#" data-toggle="dropdown" class="dropdown-toggle">Drop Down
