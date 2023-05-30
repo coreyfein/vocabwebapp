@@ -5,7 +5,7 @@ from simplevocab.forms import VocabEntryUserInputForm, VocabListUploadForm, Quiz
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from scripts import add_vocabentry, create_quiz_queue
+from scripts import add_vocabentry, create_quiz_queue, add_quizresponses
 import csv
 from io import TextIOWrapper
 
@@ -133,4 +133,6 @@ class QuizSubmitView(LoginRequiredMixin, FormView):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
         print(form.cleaned_data)
+        q = add_quizresponses.run(form.cleaned_data, self.request.user)
+        print(q)
         return super().form_valid(form)
