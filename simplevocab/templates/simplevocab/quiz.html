@@ -1,0 +1,25 @@
+{% extends "base_menu.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+  <form action="" method="post">
+    {% csrf_token %}
+    
+    {% for field in form %}
+        {% for vocab_entry_dict in vocabentries_to_quiz %}
+            {% if vocab_entry_dict.field_name == field.name %}
+                <p>{{vocab_entry_dict.vocab_entry.word.word}}</p>
+                <p>
+                    <a href="javascript:void(0)" onclick="alert('Definition: {{vocab_entry_dict.vocab_entry.word.definition}}\nSynonyms: {{vocab_entry_dict.vocab_entry.word.synonyms}}\nExamples: {{vocab_entry_dict.vocab_entry.word.examples}}\nEtymology: {{vocab_entry_dict.vocab_entry.word.etymology}}\nDiscovery Source: {{vocab_entry_dict.vocab_entry.discovery_source}}\nDiscovery Context: {{vocab_entry_dict.vocab_entry.discovery_context}}'); return false;">Show Word Details</a>
+                </p>
+            {% endif %}
+        {% endfor %}
+        {{field}}
+        <br/>
+        <br/>
+    {% endfor %}
+    <input type="submit" value="Submit Quiz">
+    <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
+</form>
+{% endblock %}

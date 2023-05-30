@@ -20,6 +20,8 @@ urlpatterns = [
         views.VocabEntryCreateView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocabentry_create'),
     path('upload',
         views.VocabListUploadView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocab_list_upload'),
+    path('quiz',
+        views.QuizSubmitView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='quiz'),    
 ]
 
 # We use reverse_lazy in urls.py to delay looking up the view until all the paths are defined

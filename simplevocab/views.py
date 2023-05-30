@@ -1,9 +1,11 @@
+from typing import Any, Dict
 from simplevocab.models import Word, VocabEntry
 from simplevocab.owner import OwnerListView, OwnerDetailView, OwnerCreateView, OwnerUpdateView, OwnerDeleteView
-from simplevocab.forms import VocabEntryUserInputForm, VocabListUploadForm
+from simplevocab.forms import VocabEntryUserInputForm, VocabListUploadForm, QuizForm
 from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from scripts import add_vocabentry
+from scripts import add_vocabentry, create_quiz_queue
 import csv
 from io import TextIOWrapper
 
@@ -12,7 +14,6 @@ class WordListView(OwnerListView):
     field_to_filter_by = "created_by"
     # By convention:
     # template_name = "simplevocab/words_list.html"
-
 
 class WordDetailView(OwnerDetailView):
     model = Word
@@ -113,5 +114,23 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
 
         return super().form_valid(form)
     
-        
+class QuizSubmitView(LoginRequiredMixin, FormView):
+    template_name = "simplevocab/quiz.html"
+    form_class = QuizForm
 
+    def get_form_kwargs(self):
+        self.vocabentries_to_quiz = create_quiz_queue.run(self.request.user, 10)
+        kwargs = super(QuizSubmitView, self).get_form_kwargs()
+        kwargs.update({"vocabentries_to_quiz": self.vocabentries_to_quiz})# pass self.vocabentries_to_quiz into forms.py
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["vocabentries_to_quiz"] = self.vocabentries_to_quiz
+        return context
+    
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        print(form.cleaned_data)
+        return super().form_valid(form)

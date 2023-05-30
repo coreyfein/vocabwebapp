@@ -27,3 +27,20 @@ class VocabListUploadForm(forms.Form):
             )
         return cleaned_data
 
+class QuizForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.vocabentries_to_quiz = kwargs.pop("vocabentries_to_quiz")#retrieve vocabentries_to_quiz from views.py and remove from kwargs before running __init__
+        choices = [
+        (1, 'Correct'),
+        (0, 'Incorrect'),
+    ]
+        for vocab_entry_dict in self.vocabentries_to_quiz:
+            self.base_fields["vocab_entry_{}".format(vocab_entry_dict["vocab_entry"].id)] = forms.ChoiceField(
+                widget=forms.RadioSelect,
+                choices=choices
+            )
+        super(QuizForm, self).__init__(*args, **kwargs)
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        return cleaned_data
