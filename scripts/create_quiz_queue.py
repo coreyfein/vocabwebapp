@@ -63,7 +63,14 @@ def run(user, words_per_quiz):
     print(quizzed_queue)
     print(full_queue)
     print(len(full_queue))
-    return(full_queue)
+    full_queue_with_additional_data = []
+    for count, vocab_entry in enumerate(full_queue):
+        full_queue_with_additional_data.append({
+            "question_number": count + 1,
+            "vocab_entry": vocab_entry,
+            "field_name": "vocab_entry_{}".format(vocab_entry.id)
+        })
+    return full_queue_with_additional_data
 
 if __name__ == "__main__":
     run()
