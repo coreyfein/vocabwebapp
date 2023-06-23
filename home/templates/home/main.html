@@ -1,7 +1,49 @@
 {% extends "base_menu.html" %}
 {% block content %}
-    <h1>Welcome to {{ settings.APP_NAME }}</h1>
+    <h4>Vocab for Readers is a tool for people who want to actually learn the words they look up.</h4>
+    <h3>Adding words</h3>
     <p>
-    Hello world.
+        Using it is simple. When you come across a word you don't know, add it to your list just by following a few quick steps. 
+        We'll handle retrieving the definition, synonyms, examples, etymology, and 
+        You can add just the word, or you can also add the word within the sentence where you discovered it, 
+        and/or a description of the work as a whole (e.g. "An article in the NYT about monarch butterflies").
+        Including all three is a unique and effective way to remember a word's meaning -- and fun to look back on as your vocab list grows.
     </p>
+    <p>
+        See below for instructions on how to add a word from your phone or computer. If you already have a vocab list, you can upload it <a href="{% url 'simplevocab:vocab_list_upload' %}">here</a>.
+    </p>
+    <h4>
+        iPhone
+    </h4>
+    <p>
+        [link to download shortcut, instructions for shortcut]
+    </p>
+    <h4>
+        Browser
+    </h4>
+    <p>
+        <a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word to your vocab list</a>
+    </p>
+    <h3>
+        Quizzes
+    </h3>
+    <p>
+        Once you've added some words to your list, the next step is to quiz yourself. 
+        Each quiz contains 10-15 words, depending on how many you've added recently that you haven't been quizzed on yet.
+        For each word in the quiz, think about whether you know what it means. 
+        Then, click a button to show the definition, synonyms, etc, and choose "Correct" if you got it right. 
+        Only mark it correct if you're confident that you really know it -- you should be able to use it in a sentence, not just have the definition memorized.
+        We'll use your quiz results to help decide what to quiz you on next.
+    </p>
+    <p>
+        Soon, you'll be able to sign up for email reminders linking to your next quiz (and at some point, you'll be able to customize the frequency).
+    </p>
+    <h3>
+        View your vocab list
+    </h3>
+    <p>
+        You can see all the words in your vocab list (soon, along with stats showing how well you know them) <a href="{% url 'simplevocab:all_vocabentries' %}">here</a>.
+    </p>    
+    
+    
 {% endblock content %}
