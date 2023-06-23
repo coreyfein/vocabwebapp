@@ -1,18 +1,31 @@
 {% extends "base_menu.html" %}
 
 {% block content %}
-
+{% load static %}
 {% load crispy_forms_tags %}
+<link rel="stylesheet" href="{% static 'simplevocab/style.css' %}">
   <form action="" method="post">
     {% csrf_token %}
-    
     {% for field in form %}
         {% for vocab_entry_dict in vocabentries_to_quiz %}
             {% if vocab_entry_dict.field_name == field.name %}
-                <p>{{vocab_entry_dict.vocab_entry.word.word}}</p>
-                <p>
+            <h4>{{vocab_entry_dict.vocab_entry.word}}</h4>
+            <div id="{{vocab_entry_dict.vocab_entry.word}}" style="display: none">
+                <p>Definition: {{vocab_entry_dict.definition}}</br>
+                Synonyms: {{vocab_entry_dict.synonyms}}</br>
+                Examples: {{vocab_entry_dict.examples}}</br>
+                Etymology: {{vocab_entry_dict.etymology}}</br>
+                Discovery Source: {{vocab_entry_dict.discovery_source}}</br>
+                Discovery Context: {{vocab_entry_dict.discovery_context}}</p>
+            </div>
+            <script type="text/javascript" 
+                    src="{% static 'simplevocab/display_word_data.js' %}">
+            </script><!-- remember to update STATIC_ROOT when deploying: https://docs.djangoproject.com/en/4.2/howto/static-files/ -->
+            <a id="a-{{vocab_entry_dict.vocab_entry.word}}" href="javascript:void(0)" onclick="displayWordData('{{vocab_entry_dict.vocab_entry.word}}'); return false;">Show Word Details</a>
+                
+                <!-- <button>
                     <a href="javascript:void(0)" onclick="alert('Definition: {{vocab_entry_dict.vocab_entry.word.definition}}\nSynonyms: {{vocab_entry_dict.vocab_entry.word.synonyms}}\nExamples: {{vocab_entry_dict.vocab_entry.word.examples}}\nEtymology: {{vocab_entry_dict.vocab_entry.word.etymology}}\nDiscovery Source: {{vocab_entry_dict.vocab_entry.discovery_source}}\nDiscovery Context: {{vocab_entry_dict.vocab_entry.discovery_context}}'); return false;">Show Word Details</a>
-                </p>
+                </button> -->
             {% endif %}
         {% endfor %}
         {{field}}

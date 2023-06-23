@@ -1,13 +1,8 @@
 <!DOCTYPE html>
+{% load static %}
 <html>
 <head>
-<!-- Edit dj4e-samples/settings.py and add APP_NAME = 'DJ4E Samples' or similar -->
 <title>{% block title %}{{ settings.APP_NAME }}{% endblock %}</title>
-
-<!-- Replace this value (42-42) with the one provided by the autograder -->
-<meta name="dj4e" content="bbba677a7830a14343512ae9637e3879">
-
-<meta name="dj4e-code" content="42168281268714">
 
 <link rel="stylesheet"
     href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
@@ -27,15 +22,15 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
     crossorigin="anonymous"></script>
 
-<script
+<!-- <script
   src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
-  crossorigin="anonymous"></script>
+  crossorigin="anonymous"></script> -->
+
+<script src="{% static 'jquery-3.7.0.min.js' %}"></script>
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/v4-shims.css">
-
-<meta name="dj4e-version" content="2022-11-01">
 
 {% block head %} {% endblock %}
 

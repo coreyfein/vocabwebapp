@@ -65,10 +65,34 @@ def run(user, words_per_quiz):
     print(len(full_queue))
     full_queue_with_additional_data = []
     for count, vocab_entry in enumerate(full_queue):
+        print(vocab_entry.word)
+        if vocab_entry.definition_override and vocab_entry.definition_override != "":
+            definition = vocab_entry.definition_override
+        else:
+            definition = vocab_entry.word.definition
+        if vocab_entry.synonyms_override and vocab_entry.synonyms_override != "":
+            synonyms = vocab_entry.synonyms_override
+        else:
+            synonyms = vocab_entry.word.synonyms
+        if vocab_entry.examples_override and vocab_entry.examples_override != "":
+            examples = vocab_entry.examples_override
+        else:
+            examples = vocab_entry.word.examples
+        if vocab_entry.etymology_override and vocab_entry.etymology_override != "":
+            etymology = vocab_entry.etymology_override
+        else:
+            etymology = vocab_entry.word.etymology
+        discovery_source = vocab_entry.discovery_source
+        discovery_context = vocab_entry.discovery_context
+        print(definition)
         full_queue_with_additional_data.append({
             "question_number": count + 1,
             "vocab_entry": vocab_entry,
-            "field_name": "vocab_entry_{}".format(vocab_entry.id)
+            "field_name": "vocab_entry_{}".format(vocab_entry.id),
+            "definition": definition,
+            "synonyms": synonyms,
+            "examples": examples,
+            "etymology": etymology
         })
     return full_queue_with_additional_data
 
