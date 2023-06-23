@@ -9,12 +9,10 @@
     <!-- https://stackoverflow.com/questions/22047251/django-dynamically-get-view-url-and-check-if-its-the-current-page -->
     <ul class="nav navbar-nav">
 
-      <!-- Assign output of url function to a variable named
-          'quiz' to use in the if statement -->
+      <!-- Assign output of url function to a variable to use in the if statement -->
       {% url 'simplevocab:all_vocabentries' as vocab_list %}
       <li {% if request.get_full_path == vocab_list %}class="active"{% endif %}>
           <a href="{% url 'simplevocab:all_vocabentries' %}">Vocab List</a></li>
-      
       {% url 'simplevocab:quiz' as quiz %}
       <li {% if request.get_full_path == quiz %}class="active"{% endif %}>
           <a href="{% url 'simplevocab:quiz' %}">Quiz</a></li>
