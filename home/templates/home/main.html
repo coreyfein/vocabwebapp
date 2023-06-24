@@ -1,13 +1,23 @@
 {% extends "base_menu.html" %}
+{% load static %}
 {% block content %}
-    <h4>Vocab for Readers is a tool for people who want to actually learn the words they look up.</h4>
+    <h3>Who is this for?</h3>    
+    <p>Readers! More specifically, readers who want to actually learn the words they look up.</p>
+    <p>
+        I come across new words often -- reading the news, books, or even doing crossword puzzles -- 
+        and find that I often see words that I know I've looked up before months ago, but can't remember what they mean.
+        The words that I actually remember tend to be ones that I discover and look up once, and then happen to see again soon after. 
+        ("Oh yeah! I just saw that word in the article I read yesterday about monarch butterflies!") 
+        This is a tool that aims to replicate that recognition for every word you discover as you read, even if you don't see it that often. 
+        
+    </p>
     <h3>Adding words</h3>
     <p>
         Using it is simple. When you come across a word you don't know, add it to your list just by following a few quick steps. 
-        We'll handle retrieving the definition, synonyms, examples, etymology, and 
-        You can add just the word, or you can also add the word within the sentence where you discovered it, 
+        We'll handle retrieving the definition, synonyms, examples, and etymology.
+        You can add just the word, the sentence where you discovered it, 
         and/or a description of the work as a whole (e.g. "An article in the NYT about monarch butterflies").
-        Including all three is a unique and effective way to remember a word's meaning -- and fun to look back on as your vocab list grows.
+        Including all three is a uniquely effective method for ultimately learning a word's meaning, and Vocab for Readers makes the process simple.
     </p>
     <p>
         See below for instructions on how to add a word from your phone or computer. If you already have a vocab list, you can upload it <a href="{% url 'simplevocab:vocab_list_upload' %}">here</a>.
@@ -16,7 +26,7 @@
         iPhone
     </h4>
     <p>
-        [link to download shortcut, instructions for shortcut]
+        Download the Vocab for Readers shortcut <a href=" {% static 'home/Add Word to Vocab List.shortcut' %}" download>here</a>.
     </p>
     <h4>
         Browser
