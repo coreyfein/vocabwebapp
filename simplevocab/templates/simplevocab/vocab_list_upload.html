@@ -1,6 +1,22 @@
 {% extends "base_menu.html" %}
-
+{% load static %}
 {% block content %}
+
+<h3>Have a vocab list already?</h3>
+
+<p>
+  Fill in our template, then upload it to add your words to your Vocab for Readers list. 
+</p>
+
+<p><a href="{% static 'simplevocab/vocabforreaders_upload_template.csv' %}" download>Download Template</a></p>
+
+<p>
+  Only the "word" column is required -- we'll retrieve definitions, synonyms, examples, and etymology if you don't have those in your list already. 
+  If you want to use your own word data, fill in those columns as well and that's what you'll see in your list and when quizzed. 
+  Like in the template, some words might just have the word itself filled in, and others might have some or all of the other columns filled in.
+  Files must be in .csv format to upload.
+</p>
+
 {% load crispy_forms_tags %}
 <form method="POST" enctype="multipart/form-data">
   {% csrf_token %}
