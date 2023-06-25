@@ -2,32 +2,53 @@
 {% load static %}
 {% block content %}
     <h3>Who is this for?</h3>    
-    <p>Readers! More specifically, readers who want to actually learn the words they look up.</p>
+    <p>Readers who want to actually learn the words they look up.</p>
     <p>
         I come across new words often -- reading the news, books, or even doing crossword puzzles -- 
-        and find that I often see words that I know I've looked up before months ago, but can't remember what they mean.
+        and am often frustrated to find that I forget what they mean by the time I see them next.
         The words that I actually remember tend to be ones that I discover and look up once, and then happen to see again soon after. 
         ("Oh yeah! I just saw that word in the article I read yesterday about monarch butterflies!") 
-        This is a tool that aims to replicate that recognition for every word you discover as you read, even if you don't see it that often. 
+        This is a tool that helps to replicate that recognition for every word you discover as you read, even if you don't see it that often. 
         
     </p>
     <h3>Adding words</h3>
     <p>
-        Using it is simple. When you come across a word you don't know, add it to your list just by following a few quick steps. 
-        We'll handle retrieving the definition, synonyms, examples, and etymology.
-        You can add just the word, the sentence where you discovered it, 
-        and/or a description of the work as a whole (e.g. "An article in the NYT about monarch butterflies").
-        Including all three is a uniquely effective method for ultimately learning a word's meaning, and Vocab for Readers makes the process simple.
+        When you come across a word you don't know, add it to your list just by following a few quick steps. 
+        We'll handle retrieving the definition, synonyms, examples, and etymology. 
+        You can enter just the word if you'd like, but we'll also ask you for the sentence in which you discovered it. 
+        You can also enter a description of the source you found it in (e.g. "An article in the NYT about monarch butterflies").
+        Including all three is a uniquely effective method for ultimately learning a word's meaning, and the process is simple.
     </p>
     <p>
-        See below for instructions on how to add a word from your phone or computer. If you already have a vocab list, you can upload it <a href="{% url 'simplevocab:vocab_list_upload' %}">here</a>.
-    </p>
+        See below for instructions on how to add a word from your phone or computer. 
+        If you already have a vocab list that you'd like to build off of, you can upload it <a href="{% url 'simplevocab:vocab_list_upload' %}">here</a>.
+    </p></br>
     <h4>
-        iPhone
+        iPhone</br>
     </h4>
-    <p>
-        Download the Vocab for Readers shortcut <a href="https://www.icloud.com/shortcuts/1bf768e427974c738162cef0113cb323" download>here</a>.
+
+    <p>If you read on your iPhone, the Vocab for Readers shortcut makes it even easier to add words to your list. No need to open a tab in a browser. </p>
+
+    <h5>Setup</h5>
+
+    <p>Download the Vocab for Readers shortcut <a href="https://www.icloud.com/shortcuts/10385cfdd0bc4140a3c8411af4851f87" download>here</a>.</p>
+    <p>Tap "Add Shortcut" on the bottom of your screen. This will open up your Shortcuts app, which already exists on every iPhone. You can exit the Shortcuts app as soon as it opens.</p>
+    <!-- <p>Tap the three-dot menu at the top right of the shortcut you just installed ("Vocab for Readers"). This will open up the shortcut.</p>
+    <p>At the bottom of your screen, click the share button (the square with an up arrow).</p>
+    <p>Scroll down and tap "Add to Home Screen" and then confirm by tapping "Add" at the top right.</p></br> -->
+
+    <h5>Adding a Word</h5>
+    <p>Select and copy the sentence that includes the word you'd like to add. (You can copy just the word if you'd like, but the context can help you learn it.)</p>
+    <p>With the text still highlighted from when you copied it, tap the selected text and you'll see the same menu come up. This time instead of tapping "Copy," arrow over to the right until you see "Share..." and tap that. Then, scroll down and tap "Vocab for Readers"</p>
+    <!-- <p>Go to your home screen and tap the icon for the shortcut (it's a white book on a teal background).</p> -->
+    <p>You'll be prompted to enter where you discovered the word and whether you've copied the word in the context of a sentence or just the word. 
+        If you copied the word in context, you'll be prompted to type the word.
+        The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow."
     </p>
+    <p>You'll then be redirected to your browser. If you're logged in, you'll see a form pre-filled with the word you want to add. Click "Add to Vocab List" and you're all set. 
+        If you're not already logged in, you'll need to login first (you can login with Google or Github) and then tap the Vocab for Readers icon again. 
+    </p>
+
     <h4>
         Browser
     </h4>
