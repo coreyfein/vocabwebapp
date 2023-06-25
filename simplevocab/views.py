@@ -110,7 +110,7 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
             success, error_message = add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
             if not success:
                 errored_words.append((word, error_message))
-        print("errored_words: {}".format(errored_words))
+        print("errored_words: {}".format(errored_words))# Show this to the user somehow (passed to some page as a message?)
 
         return super().form_valid(form)
     
