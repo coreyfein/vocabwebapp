@@ -48,12 +48,14 @@
     <p>You'll then be redirected to your browser. If you're logged in, you'll see a form pre-filled with the word you want to add. Click "Add to Vocab List" and you're all set. 
         If you're not already logged in, you'll need to login first (you can login with Google or Github) and then tap the Vocab for Readers icon again. 
     </p>
+    </br>
 
     <h4>
         Browser
     </h4>
+    <p>Select and copy the sentence that includes the word you'd like to add. (You can copy just the word if you'd like, but the context can help you learn it.)</p>
     <p>
-        <a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word to your vocab list</a>
+        Go to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page and paste the full sentence into the "Discovery Context" field. Type the word in the "Word" field. Enter where you came across the word in the "Discover Source" field.
     </p>
     <h3>
         Quizzes
