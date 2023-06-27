@@ -24,7 +24,7 @@ class VocabEntry(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)#should maybe remove null=True eventually
     word = models.ForeignKey('Word', on_delete=models.CASCADE, null=False)
-    discovery_source = models.CharField(max_length=50)
+    discovery_source = models.CharField(max_length=255)
     last_quiz = models.BooleanField(default=False)
     definition_override = models.CharField(max_length=255, default="", null=True, blank=True)
     synonyms_override = models.CharField(max_length=255, default="", null=True, blank=True)
