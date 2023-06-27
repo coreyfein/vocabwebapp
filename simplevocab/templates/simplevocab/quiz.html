@@ -26,11 +26,12 @@
                 <!-- <button>
                     <a href="javascript:void(0)" onclick="alert('Definition: {{vocab_entry_dict.vocab_entry.word.definition}}\nSynonyms: {{vocab_entry_dict.vocab_entry.word.synonyms}}\nExamples: {{vocab_entry_dict.vocab_entry.word.examples}}\nEtymology: {{vocab_entry_dict.vocab_entry.word.etymology}}\nDiscovery Source: {{vocab_entry_dict.vocab_entry.discovery_source}}\nDiscovery Context: {{vocab_entry_dict.vocab_entry.discovery_context}}'); return false;">Show Word Details</a>
                 </button> -->
+            {{field}}
+            <br/>
+            <br/>
             {% endif %}
         {% endfor %}
-        {{field}}
-        <br/>
-        <br/>
+        
     {% endfor %}
     <input type="submit" value="Submit Quiz">
     <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
