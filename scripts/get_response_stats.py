@@ -7,6 +7,15 @@ def run(user):
     user_responses = QuizResponse.objects.filter(user=user).order_by("-created_at")
     vocab_entries = VocabEntry.objects.filter(user=user).order_by("-created_at")
     for vocab_entry in vocab_entries:
+        # if not vocab_entry.definition_override or vocab_entry.definition_override == "":
+        #     definition = vocab_entry.word.definition
+        # if not vocab_entry.synonyms_override or vocab_entry.synonyms_override == "":
+        #     synonyms = vocab_entry.word.synonyms
+        # dictionary_data_str = """Definition: {}
+        # Synonyms: {}
+        # """.format(definition, synonyms)
+        # print("dictionary_data_str")
+        # print(dictionary_data_str)
         response_stats[vocab_entry.word.word] = {
             "all_time":{
                 "correct": 0, 
@@ -21,7 +30,8 @@ def run(user):
             "streak": "Not yet quizzed",
             "streak_status": "ongoing",
             "discovery_source": vocab_entry.discovery_source,
-            "discovery_context": vocab_entry.discovery_context
+            "discovery_context": vocab_entry.discovery_context,
+            # "dictionary_data_str": dictionary_data_str
         }
     for user_response in user_responses:
         word = str(user_response.vocab_entry.word)
