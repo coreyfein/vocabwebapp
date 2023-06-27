@@ -5,7 +5,7 @@ from simplevocab.forms import VocabEntryUserInputForm, VocabListUploadForm, Quiz
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from scripts import add_vocabentry, create_quiz_queue, add_quizresponses
+from scripts import add_vocabentry, create_quiz_queue, add_quizresponses, get_response_stats
 import csv
 from io import TextIOWrapper
 
@@ -41,6 +41,11 @@ class VocabEntryListView(OwnerListView):
     field_to_filter_by = "user"
     # By convention:
     # template_name = "simplevocab/vocabentry_list.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        response_stats = get_response_stats.run(self.request.user)
+        context['response_stats'] = response_stats
+        return context
 
 class VocabEntryDetailView(OwnerDetailView):
     model = VocabEntry

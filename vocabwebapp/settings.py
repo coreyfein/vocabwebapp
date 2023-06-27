@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
     'taggit',
+    'mathfilters'
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'

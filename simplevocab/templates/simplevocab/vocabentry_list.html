@@ -1,41 +1,83 @@
 {% extends "base_menu.html" %}
+{% load mathfilters %}
 {% block content %}
   <h1>Vocab List</h1>
   <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
   <p><a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a vocab list</a></p>
   {% if vocabentry_list %}
-  <ul>
-    {% for vocabentry in vocabentry_list %}
-      <li>
-          {{ vocabentry.word.word }}
-          (<a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update</a> |
-          <a href="{% url 'simplevocab:vocabentry_delete' vocabentry.id %}">Delete</a>) <br/>
-          Definition: {% if vocabentry.definition_override == "" or not vocabentry.definition_override %} 
-            {{ vocabentry.word.definition }}
-          {% else %}
-            {{ vocabentry.definition_override }}
-          {% endif %}<br/>
-          Synonyms: {% if vocabentry.synonyms_override == "" or not vocabentry.synonyms_override %} 
-          {{ vocabentry.word.synonyms }}
-          {% else %}
-            {{ vocabentry.synonyms_override }}
-          {% endif %}<br/>
-          Examples: {% if vocabentry.examples_override == "" or not vocabentry.examples_override %} 
-            {{ vocabentry.word.examples }}
-          {% else %}
-            {{ vocabentry.examples_override }}
-          {% endif %}<br/>
-          Etymology: {% if vocabentry.etymology_override == "" or not vocabentry.etymology_override %} 
-            {{ vocabentry.word.etymology }}
-          {% else %}
-            {{ vocabentry.etymology_override }}
-          {% endif %}<br/>
-          Discovery Context: {{ vocabentry.discovery_context }}<br/>
-          Discovery Source: {{ vocabentry.discovery_source }}<br/>
-          In Last Quiz: {{ vocabentry.last_quiz }}<br/>
-      </li>
-    {% endfor %}
-  </ul>
+  <table>
+    <tr>
+      <th style="width:15%">Word</th>
+      <th style="width:15%">% Correct</th>
+      <th style="width:10%">Last 10</th>
+      <th style="width:10%">Streak</th>
+      <th style="width:30%">Discovery Source</th>
+      <th style="width:20%">Dictionary Entry</th>
+    </tr>
+    {% comment %} {% for vocabentry in vocabentry_list %}
+    <tr>
+      <td>
+        {{ vocabentry.word.word }}
+        (<a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update</a> |
+        <a href="{% url 'simplevocab:vocabentry_delete' vocabentry.id %}">Delete</a>)
+      </td> {% endcomment %}
+    {% for word, subword in response_stats.items %}
+    <tr> 
+      <td> 
+        {{word}}
+      </td>
+      <td>
+        {% for subword, stats in subword.items %}
+          {% if subword == "all_time" %}
+            {% for stat, value in stats.items %}
+              {% if stat == "percent_correct" %}
+                {{ value }}%
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </td>
+      <td>
+        {% for subword, stats in subword.items %}
+          {% if subword == "last_ten" %}
+            {% for stat, value in stats.items %}
+              {% if stat == "correct" %}
+                {{ value }} /
+              {% endif %}
+            {% endfor %}
+            {% for stat, value in stats.items %}
+              {% if stat == "total" %}
+                {{ value }}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      </td>
+      <td>
+        {% for subword, value in subword.items %}
+          {% if subword == "streak" %}  
+            {% if value < 0 %}
+              {{ value | abs}} Incorrect
+            {% else %}
+              {{ value | abs}} Correct
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </td>
+      <td>
+        {% for subword, value in subword.items %}
+          {% if subword == "discovery_source" %}  
+            {{ value }}
+          {% endif %}
+        {% endfor %}
+      </td>
+      <td>
+        Expand Dictionary Entry
+      <td>
+        
+    </tr>
+    {% endfor %}         
+  </table>
   {% else %}
     <p>There are no vocab entries for this user.</p>
   {% endif %}
