@@ -33,7 +33,9 @@ class QuizForm(forms.Form):
         choices = [
         (1, 'Correct'),
         (0, 'Incorrect'),
-    ]
+        ]
+        self.base_fields = {}# for some reason self.base_fields was sometimes (and only sometimes) populating with fields before this, 
+        # causing extra hidden fields to be present and prevent form from being submitted. clearing it here fixed the bug.
         for vocab_entry_dict in self.vocabentries_to_quiz:
             self.base_fields["vocab_entry_{}".format(vocab_entry_dict["vocab_entry"].id)] = forms.ChoiceField(
                 widget=forms.RadioSelect,
