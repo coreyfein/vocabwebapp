@@ -1,0 +1,25 @@
+body,table{
+    font-family:verdana,arial,sans-serif;
+    font-size:12px;
+    border-collapse:collapse;
+}
+
+td,th{
+    padding:3px 3px;
+    margin:0px;
+    border:1px solid #BBB;
+    
+}
+
+/* .discovery_source{
+    height:auto;
+    width:1000px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+.discovery_source:hover{
+    height:30px;
+    transition:1s;
+    overflow:pre-line;
+} */
