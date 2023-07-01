@@ -1,21 +1,21 @@
 {% extends "base_menu.html" %}
 
 {% block content %}
+<h3>{{object.word.word}}</h3> <br/>
+To override this word's definition, synonyms, examples, or etymology in your vocab list, enter your own data below and submit.
+Any field left blank will use our default word data, shown below the form. You can also update the word's Discovery Source and Discovery Context if you'd like.<br/>
+<br/>
 {% load crispy_forms_tags %}
-  <form action="" method="post">
-    {% csrf_token %}
-    {{object.word.word}} <br/>
-    <br/>
-    Default data for this word: <br/>
-    Definition: {{object.word.definition}} <br/>
-    Synonyms: {{object.word.synonyms}} <br/>
-    Examples: {{object.word.examples}} <br/>
-    Etymology: {{object.word.etymology}} <br/>
-    <br/>
-    To override this word's data in your vocab list, enter your own data below and submit: <br/>
-    <br/>
-    {{ form | crispy }}
-    <input type="submit" value="Submit">
-    <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
-  </form>
+<form action="" method="post">
+  {% csrf_token %}
+  {{ form | crispy }}
+  <input type="submit" value="Submit">
+  <input type="submit" onclick="window.location='{% url 'simplevocab:vocabentry_detail' vocabentry.id %}' ; return false;" value="Cancel">
+</form>
+<br/>
+<h4>Default Word Data:</h4>
+Definition: {{object.word.definition}} <br/><br/>
+Synonyms: {{object.word.synonyms}} <br/><br/>
+Examples: {{object.word.examples}} <br/><br/>
+Etymology: {{object.word.etymology}}<br/><br/>
 {% endblock %}

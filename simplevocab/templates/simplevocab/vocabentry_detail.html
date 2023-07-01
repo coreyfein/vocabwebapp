@@ -1,0 +1,35 @@
+{% extends "base_menu.html" %}
+{% block content %}
+<h3>{{vocabentry.word.word}}</h3>
+
+<a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update Word Data</a><br/><br/>
+
+Discovery Source: {{vocabentry.discovery_source}}<br/><br/>
+Discovery Context: {{vocabentry.discovery_context}}<br/><br/>
+
+{% if vocabentry.definition_override == None %}
+  Definition: {{vocabentry.word.definition}}<br/><br/>
+{% else %}
+  Definition: {{vocabentry.definition_override}}<br/><br/>
+{% endif %}
+
+{% if vocabentry.synonyms_override == None %}
+  Synonyms: {{vocabentry.word.synonyms}} <br/><br/>
+{% else %}
+Synonyms: {{vocabentry.synonyms_override}}<br/><br/>
+{% endif %}
+
+{% if vocabentry.examples_override == None %}
+  Examples: {{vocabentry.word.examples}} <br/><br/>
+{% else %}
+  Examples: {{vocabentry.examples_override}}<br/><br/>
+{% endif %}
+
+{% if vocabentry.etymology_override == None %}
+  Etymology: {{vocabentry.word.etymology}} <br/><br/>
+{% else %}
+  Etymology: {{vocabentry.etymology_override}}<br/><br/>
+{% endif %}
+
+{% endblock %}
+

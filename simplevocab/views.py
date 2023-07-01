@@ -5,6 +5,7 @@ from simplevocab.forms import VocabEntryUserInputForm, VocabListUploadForm, Quiz
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 from scripts import add_vocabentry, create_quiz_queue, add_quizresponses, get_response_stats
 import csv
 from io import TextIOWrapper
@@ -62,6 +63,10 @@ class VocabEntryUpdateView(OwnerUpdateView):
         word = vocabentry.word.word
         context['word'] = word
         return context
+    
+    def get_success_url(self):
+        vocabentry_id = self.object.pk
+        return reverse_lazy('simplevocab:vocabentry_detail', kwargs={'pk': vocabentry_id})
     
 class VocabEntryDeleteView(OwnerDeleteView):
     model = VocabEntry

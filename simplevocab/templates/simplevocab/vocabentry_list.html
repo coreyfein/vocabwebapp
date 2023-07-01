@@ -21,7 +21,8 @@
         {% for vocabentry in vocabentry_list %}
           {% if vocabentry.word.word == word %}
             {{word}}
-            (<a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">View/Update</a> |
+            (<a href="{% url 'simplevocab:vocabentry_detail' vocabentry.id %}">View</a> |
+            <a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update</a> |
             <a href="{% url 'simplevocab:vocabentry_delete' vocabentry.id %}">Delete</a>)
           {% endif %}
         {% endfor %}
