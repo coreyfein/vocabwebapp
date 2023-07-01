@@ -1,6 +1,4 @@
 from simplevocab.models import Word, VocabEntry, QuizResponse
-import pprint
-import copy
 
 def run(user):
     response_stats = {}
@@ -68,8 +66,6 @@ def run(user):
             else:
                 response_stats[word]["last_ten"]["percent_correct"] = 0
             
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(response_stats)
     return response_stats
 
 if __name__ == "__main__":

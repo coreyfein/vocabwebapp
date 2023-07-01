@@ -1,5 +1,4 @@
 from simplevocab.models import Word, VocabEntry, QuizResponse
-import pprint
 
 def run(user, words_per_quiz):
     unquizzed_vocabentry_objects = []
@@ -33,8 +32,6 @@ def run(user, words_per_quiz):
                     vocab_entry_streaks[user_response.vocab_entry]["streak"] += 1
                 else:
                     vocab_entry_streaks[user_response.vocab_entry]["streak_status"] = "ended"
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(vocab_entry_streaks)
     quizzed_queue_no_cap = sorted(vocab_entry_streaks, key=lambda x: (-vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]), reverse=True)
     # above sorts by -streak first, then most recent quiz date. that would make higher streaks first, then oldest most_recent_quiz_date. both are then reversed, making it sorted by lowest streak, then newest most_recent_quiz_date
     if len(quizzed_queue_no_cap) >= words_per_quiz:
