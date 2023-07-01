@@ -16,47 +16,53 @@
         When you come across a word you don't know, add it to your list just by following a few quick steps. 
         We'll handle retrieving the definition, synonyms, examples, and etymology. 
         You can enter just the word if you'd like, but we'll also ask you for the sentence in which you discovered it. 
-        You can also enter a description of the source you found it in (e.g. "An article in the NYT about monarch butterflies").
-        Including all three is a uniquely effective method for ultimately learning a word's meaning, and the process is simple.
+        You'll also enter a description of the source you found it in (e.g. "An article in the NYT about monarch butterflies").
+        Including all three is a uniquely effective way to ultimately learn the word.
     </p>
     <p>
         See below for instructions on how to add a word from your phone or computer. 
         If you already have a vocab list that you'd like to build off of, you can upload it <a href="{% url 'simplevocab:vocab_list_upload' %}">here</a>.
     </p></br>
-    <h4>
-        iPhone</br>
-    </h4>
-
-    <p>If you read on your iPhone, the Vocab for Readers shortcut makes it even easier to add words to your list. No need to open a tab in a browser. </p>
-
-    <h5>Setup</h5>
-
-    <p>On your iPhone, download the <a href="https://www.icloud.com/shortcuts/10385cfdd0bc4140a3c8411af4851f87" download>Vocab for Readers shortcut</a>.</p>
-    <p>Tap "Add Shortcut" on the bottom of your screen. This will open up your Shortcuts app, which comes on every iPhone by default. If you've deleted the Shortucts app, you'll be prompted to reinstall it. You can exit the Shortcuts app as soon as you've successfully added the vocab for Readers shortcut.</p>
-    <!-- <p>Tap the three-dot menu at the top right of the shortcut you just installed ("Vocab for Readers"). This will open up the shortcut.</p>
-    <p>At the bottom of your screen, click the share button (the square with an up arrow).</p>
-    <p>Scroll down and tap "Add to Home Screen" and then confirm by tapping "Add" at the top right.</p></br> -->
-
-    <h5>Adding a Word</h5>
-    <p>Select and copy the sentence that includes the word you'd like to add. (You can copy just the word if you'd like, but the context can help you learn it.)</p>
-    <p>With the text still highlighted from when you copied it, tap the selected text and you'll see the same menu come up. This time instead of tapping "Copy," arrow over to the right until you see "Share..." and tap that. Then, scroll down and tap "Vocab for Readers"</p>
-    <!-- <p>Go to your home screen and tap the icon for the shortcut (it's a white book on a teal background).</p> -->
-    <p>You'll be prompted to enter where you discovered the word and whether you've copied the word in the context of a sentence or just the word. 
-        If you copied the word in context, you'll be prompted to type the word.
-        The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow."
-    </p>
-    <p>You'll then be redirected to your browser. If you're logged in, you'll see a form pre-filled with the word you want to add. Click "Add to Vocab List" and you're all set. 
-        If you're not already logged in, you'll need to login first (you can login with Google or Github) and then tap the Vocab for Readers icon again. 
-    </p>
-    </br>
 
     <h4>
         Browser
     </h4>
+    <p>Bookmark the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page for quick access.</p>
     <p>Select and copy the sentence that includes the word you'd like to add. (You can copy just the word if you'd like, but the context can help you learn it.)</p>
     <p>
-        Go to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page and paste the full sentence into the "Discovery Context" field. Type the word in the "Word" field. Enter where you came across the word in the "Discover Source" field.
+        Go to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page and paste the full sentence into the "Discovery Context" field. Type the word in the "Word" field. Enter where you came across the word in the "Discovery Source" field.
     </p>
+</br>
+    <h4>
+        iPhone</br>
+    </h4>
+
+    <p>The Vocab for Readers iPhone shortcut makes it even easier to add words to your list. No need to open a tab in a browser. </p></br>
+
+    <h5>Setup</h5>
+
+    <p>On your iPhone, download the <a href="https://www.icloud.com/shortcuts/1fd77120dc824974b934c952cbc0fd35" download>Vocab for Readers shortcut</a>.</p>
+    <p>Tap "Add Shortcut" on the bottom of your screen. This will open up your Shortcuts app, which comes on every iPhone by default. If you've deleted the Shortucts app, you'll be prompted to reinstall it. You can exit the Shortcuts app as soon as you've successfully added the vocab for Readers shortcut.</p>
+    <p>Tap the three-dot menu at the top right of the shortcut you just installed ("Vocab for Readers"). This will open up the shortcut.</p>
+    <p>At the bottom of your screen, click the share button (the square with an up arrow).</p>
+    <p>Scroll down and tap "Add to Home Screen" and then confirm by tapping "Add" at the top right.</p></br>
+
+    <h5>Adding a Word</h5>
+    <p>If you were reading on your phone when you came across the word, select and copy the sentence that includes the word you'd like to add. (You can copy just the word if you'd like, but the context can help you learn it.) If you were reading somewhere else (e.g. in a book or Kindle), continue to the next step.</p>
+    {% comment %} <p>With the text still highlighted from when you copied it, tap the selected text and you'll see the same menu come up. This time instead of tapping "Copy," arrow over to the right until you see "Share..." and tap that. Then, scroll down and tap "Vocab for Readers"</p> {% endcomment %}
+    <p>Go to your home screen and tap the icon for the VocabForReaders shortcut (it's a white book on a teal background).</p>
+    <p>You'll be prompted to enter where you discovered the word. Then, you'll be asked whether you've copied the word in the context of a sentence, just the word, or nothing at all (if you were reading somewhere besides your phone). 
+        If you copied the word in context, you'll be prompted to type the word.
+        The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow."
+    </p>
+    <p>You'll then be redirected to your browser. If you're logged in and copied the word in context or just the word, you'll see a form pre-filled with the word you want to add. 
+        If you didn't copy anything, you'll need to fill in the form in your browser. Click "Add to Vocab List" and you're all set. 
+    </p>
+    <p>    
+        If you're not already logged in, you'll be taken to a login page first (you can login with Google or Github). Once you're logged in, tap the Vocab for Readers icon again. 
+    </p>
+    </br>
+
     <h3>
         Quizzes
     </h3>
@@ -64,19 +70,21 @@
         Once you've added some words to your list, the next step is to quiz yourself. 
         Each quiz contains 10-15 words, depending on how many you've added recently that you haven't been quizzed on yet.
         For each word in the quiz, think about whether you know what it means. 
-        Then, click a button to show the definition, synonyms, etc, and choose "Correct" if you got it right. 
+        Then, click a button to show the definition, synonyms, etc, and choose "Correct" if you got it right. Either way, take a moment to study the word.
         Only mark it correct if you're confident that you really know it -- you should be able to use it in a sentence, not just have the definition memorized.
         We'll use your quiz results to help decide what to quiz you on next.
     </p>
     <p>
         Soon, you'll be able to sign up for email reminders linking to your next quiz (and at some point, you'll be able to customize the frequency).
     </p>
+</br>
     <h3>
         View your vocab list
     </h3>
     <p>
-        You can see all the words in your vocab list (soon, along with stats showing how well you know them) <a href="{% url 'simplevocab:all_vocabentries' %}">here</a>.
+        Your <a href="{% url 'simplevocab:all_vocabentries' %}">vocab list</a> shows all the words you've added along with stats showing how well you know them.
     </p>    
+</br>
     
     
 {% endblock content %}
