@@ -58,8 +58,10 @@
           {% if subword == "streak" %}  
             {% if value < 0 %}
               {{ value | abs}} Incorrect
-            {% else %}
+            {% elif value > 0 %}
               {{ value | abs}} Correct
+            {% else %}
+              Not yet quizzed
             {% endif %}
           {% endif %}
         {% endfor %}
