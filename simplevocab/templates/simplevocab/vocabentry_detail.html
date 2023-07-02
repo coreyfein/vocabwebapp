@@ -1,5 +1,6 @@
 {% extends "base_menu.html" %}
 {% block content %}
+<div class="container">
 <h3>{{vocabentry.word.word}}</h3>
 
 <a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update Word Data</a><br/><br/>
@@ -30,6 +31,6 @@ Synonyms: {{vocabentry.synonyms_override}}<br/><br/>
 {% else %}
   Etymology: {{vocabentry.etymology_override}}<br/><br/>
 {% endif %}
-
+</div>
 {% endblock %}
 

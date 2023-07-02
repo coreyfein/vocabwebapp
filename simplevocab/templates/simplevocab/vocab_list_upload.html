@@ -1,7 +1,7 @@
 {% extends "base_menu.html" %}
 {% load static %}
 {% block content %}
-
+<div class="container">
 <h3>Have a vocab list already?</h3>
 
 <p>
@@ -23,4 +23,5 @@
   {{ form | crispy}}
   <button type="submit">Upload Vocab List</button>
 </form>
+</div>
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "base_menu.html" %}
 
 {% block content %}
+<div class="container">
 <h3>{{object.word.word}}</h3> <br/>
 To override this word's definition, synonyms, examples, or etymology in your vocab list, enter your own data below and submit.
 Any field left blank will use our default word data, shown below the form. You can also update the word's Discovery Source and Discovery Context if you'd like.<br/>
@@ -18,4 +19,5 @@ Definition: {{object.word.definition}} <br/><br/>
 Synonyms: {{object.word.synonyms}} <br/><br/>
 Examples: {{object.word.examples}} <br/><br/>
 Etymology: {{object.word.etymology}}<br/><br/>
+</div>
 {% endblock %}

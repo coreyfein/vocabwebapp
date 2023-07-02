@@ -1,6 +1,7 @@
 {% extends "base_menu.html" %}
 {% load static %}
 {% block content %}
+<div class="container">
     <h3>Who is this for?</h3>    
     <p>Readers who want to actually learn the words they look up.</p>
     <p>
@@ -85,6 +86,6 @@
         Your <a href="{% url 'simplevocab:all_vocabentries' %}">vocab list</a> shows all the words you've added along with stats showing how well you know them.
     </p>    
 </br>
-    
+</div>
     
 {% endblock content %}

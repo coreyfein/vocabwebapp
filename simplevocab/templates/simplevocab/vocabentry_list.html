@@ -2,7 +2,8 @@
 {% load mathfilters %}
 {% load static %}
 {% block content %}
-  <link rel="stylesheet" href="{% static 'simplevocab/style.css' %}">
+<link rel="stylesheet" href="{% static 'simplevocab/style.css' %}">
+<div class="container">
   <h1>Vocab List</h1>
   <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
   <p><a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a vocab list</a></p>
@@ -80,5 +81,5 @@
   {% else %}
     <p>There are no vocab entries for this user.</p>
   {% endif %}
-
+</div>
 {% endblock %}

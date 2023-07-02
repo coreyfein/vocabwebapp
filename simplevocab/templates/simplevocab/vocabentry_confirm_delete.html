@@ -1,7 +1,7 @@
 {% extends "base_menu.html" %}
 
 {% block content %}
-
+<div class="container">
 <h1>Delete Vocab Entry</h1>
 
 <p>Are you sure you want to delete the vocab entry for word: {{ vocabentry.word.word }}?</p>
@@ -10,5 +10,5 @@
   {% csrf_token %}
   <input type="submit" value="Yes, delete.">
 </form>
-
+</div>
 {% endblock %}
