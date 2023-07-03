@@ -40,9 +40,9 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if user.is_authenticated %}
-          <li><a href="{% url 'logout' %}?next={% url 'simplevocab:all_vocabentries' %}">Logout</a></li>
+          <li><a href="{% url 'logout' %}?next={% url 'login' %}">Logout</a></li>
         {% else %}
-          <li><a href="{% url 'login' %}?next={% url 'simplevocab:all_vocabentries' %}">Login</a></li>
+          <li><a href="{% url 'login' %}?next={% url 'home' %}">Login</a></li>
         {% endif %}
       </ul>
       </div>
