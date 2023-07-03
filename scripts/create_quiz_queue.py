@@ -89,7 +89,9 @@ def run(user, words_per_quiz):
             "definition": definition,
             "synonyms": synonyms,
             "examples": examples,
-            "etymology": etymology
+            "etymology": etymology,
+            "discovery_source": discovery_source,
+            "discovery_context": discovery_context
         })
     return full_queue_with_additional_data
 
