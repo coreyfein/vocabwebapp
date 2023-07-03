@@ -1,15 +1,10 @@
 {% extends "base_menu.html" %}
 {% load crispy_forms_tags %}
-{% load static %}
-<script stylesheet="{% static 'simplevocab/style.css' %}"></script>
 {% block content %}
-<div class="container">
-
   <form action="" method="post">
     {% csrf_token %}
     {{ form | crispy }}
     <input type="submit" value="Add to Vocab List">
     <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
   </form>
-</div>
 {% endblock %}

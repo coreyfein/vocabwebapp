@@ -10,10 +10,3 @@ td,th{
     border:1px solid #BBB;
     
 }
-
-submit{
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border:1px solid #BBB;
-    }
