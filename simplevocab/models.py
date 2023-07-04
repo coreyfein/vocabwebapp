@@ -7,7 +7,8 @@ class Word(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     word = models.CharField(
         max_length=50,
-        null=False
+        null=False,
+        unique=True
     )
     definition = models.CharField(max_length=255)
     synonyms = models.CharField(max_length=255)
@@ -25,7 +26,6 @@ class VocabEntry(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)#should maybe remove null=True eventually
     word = models.ForeignKey('Word', on_delete=models.CASCADE, null=False)
     discovery_source = models.CharField("Discovery Source", max_length=255)
-    last_quiz = models.BooleanField(default=False)
     definition_override = models.CharField("Your Definition", max_length=255, default="", null=True, blank=True)
     synonyms_override = models.CharField("Your Synonyms", max_length=255, default="", null=True, blank=True)
     examples_override = models.CharField("Your Examples", max_length=255, default="", null=True, blank=True)
