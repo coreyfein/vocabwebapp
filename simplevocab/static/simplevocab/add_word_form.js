@@ -1,7 +1,8 @@
 $(document).ready(function() {
     
     generateDropDownOptions();
-    $("#id_discovery_context").keyup(generateDropDownOptions);
+    $("#id_discovery_context")
+        .on ("input", generateDropDownOptions);
 
     var message_value = document.getElementById("wordlist").options[0].text;
     $( "select" )
