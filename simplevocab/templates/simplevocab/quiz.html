@@ -24,7 +24,7 @@
             </script><!-- remember to update STATIC_ROOT when deploying: https://docs.djangoproject.com/en/4.2/howto/static-files/ -->
             <a id="a-{{vocab_entry_dict.vocab_entry.word}}" href="javascript:void(0)" onclick="displayWordData('{{vocab_entry_dict.vocab_entry.word}}'); return false;">Show Word Details</a>
             {{ form.errors }}
-            {{field}}
+            {{ field }}
             <br/>
             <br/>
             {% endif %}
