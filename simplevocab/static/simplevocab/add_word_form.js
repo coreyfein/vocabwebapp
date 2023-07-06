@@ -1,9 +1,26 @@
 $(document).ready(function() {
+    
+    generateDropDownOptions();
+    $("#id_discovery_context").keyup(generateDropDownOptions);
+
     var message_value = document.getElementById("wordlist").options[0].text;
-    $("#id_discovery_context").keyup(function() {
-        var discover_context_input = $(this).val();
-        var word_array_input = discover_context_input.split(/[^a-z]/i);
+    $( "select" )
+        .on( "change", function() {
+            var str = "";
+            $( "select option:selected" ).each(function() {
+            str += $( this ).text();
+            } );
+            if (str != message_value){
+                $( "#id_word" ).val( str );
+            }
+        } )
+        .trigger( "change" );
+
+    function generateDropDownOptions(){
+        var discovery_context_input = document.getElementById("id_discovery_context").value;
+        var word_array_input = discovery_context_input.split(/[^a-z]/i);
         let word_array_input_index=0;
+        var message_value = document.getElementById("wordlist").options[0].text;
         $(wordlist).empty();
         $(wordlist).append('<option value="" disabled selected>' + message_value + '</option>')
         var final_array = []
@@ -21,17 +38,5 @@ $(document).ready(function() {
             $('#wordlist').append('<option>' + final_array[final_array_input_index] + '</option>');
             final_array_input_index++;
         }
-    });
-
-    $( "select" )
-        .on( "change", function() {
-            var str = "";
-            $( "select option:selected" ).each(function() {
-            str += $( this ).text();
-            } );
-            if (str != message_value){
-                $( "#id_word" ).val( str );
-            }
-        } )
-        .trigger( "change" );
+    }
 });
