@@ -1,9 +1,38 @@
 {% extends "base_menu.html" %}
-{% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
   <form action="" method="post">
     {% csrf_token %}
-    {{ form | crispy }}
+    {% for field in form %}
+      {{ form.errors }}
+      
+      <script type="text/javascript" 
+        src="{% static 'simplevocab/add_word_form.js' %}">
+      </script><!-- remember to update STATIC_ROOT when deploying: https://docs.djangoproject.com/en/4.2/howto/static-files/ -->
+      {% if field.name == "discovery_context" %}
+        <p>Paste the context where you found the word (one or two sentences including the word itself):</p>
+        {{ field }}
+        </br>
+        </br>
+        </br>
+      {% elif field.name == "word"%}
+        <p>Type the word below, or if you've pasted the context above, you can select the word from this dropdown menu: <select class="form-select" id="wordlist">
+          <option value="" disabled selected>Select word</option>
+        </select></p>
+        {{ field }}
+        
+        </br>
+        </br>
+        </br>
+      </br>
+      {% elif field.name == "discovery_source" %}
+        <p>Where did you discover this word (e.g. "New York Times article about monarch butterflies")?</p>
+        {{ field }}      
+    {% endif %}
+    {% endfor %}
+    
+    </br>
+    </br>
     <input type="submit" value="Add to Vocab List">
     <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
   </form>

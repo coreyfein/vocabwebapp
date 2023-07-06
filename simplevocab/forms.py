@@ -4,14 +4,34 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 class VocabEntryUserInputForm(forms.Form):
-    word = forms.CharField(min_length = 1, max_length=Word._meta.get_field("word").max_length)
-    discovery_source = forms.CharField(
-        min_length = 1, max_length=VocabEntry._meta.get_field("discovery_source").max_length
-        )
     discovery_context = forms.CharField(
-        min_length = 1, max_length=VocabEntry._meta.get_field("discovery_context").max_length,
-        required=False
+        min_length = 1, 
+        max_length=VocabEntry._meta.get_field("discovery_context").max_length,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'class':'form-control'
+            }
         )
+    )
+    word = forms.CharField(min_length = 1, 
+        max_length=Word._meta.get_field("word").max_length,
+        widget=forms.TextInput(
+            attrs={
+                'class':'form-control'
+            }
+        )
+    )
+    discovery_source = forms.CharField(
+        min_length = 1, 
+        max_length=VocabEntry._meta.get_field("discovery_source").max_length,
+        widget=forms.TextInput(
+            attrs={
+                'class':'form-control'
+            }
+        )
+    )
+    
 
 class VocabListUploadForm(forms.Form):
     file = forms.FileField()
