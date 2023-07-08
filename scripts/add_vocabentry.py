@@ -47,9 +47,8 @@ def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input,
         vocab_entry_already_existed_for_word = False
         # .create() saves
     else:
-        v, vocab_entry_created = VocabEntry.objects.get_or_create(word=w)
+        v, vocab_entry_created = VocabEntry.objects.get_or_create(word=w, user=user)
         if vocab_entry_created:
-            v.user = user
             v.discovery_source = discovery_source_input
             vocab_entry_already_existed_for_word = False
         else:
