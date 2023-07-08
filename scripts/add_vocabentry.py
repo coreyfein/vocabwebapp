@@ -10,10 +10,9 @@ load_dotenv()
 def run(word_input, discovery_source_input, discovery_context_input, user, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):    
     # lemma = get_lemma_for_word(word_input) #OED version only
     # w, created = Word.objects.get_or_create(word__iexact=lemma) #OED version only
-    error_message = False
     w, created = Word.objects.get_or_create(word__iexact=word_input)
-    print("word id: " + str(w.id))
-    print("Created: {}".format(created))
+    print(f"word id: {str(w.id)}")
+    print(f"Created: {created}")
     if created:
         # word, definition_string, synonyms_string, examples_string, etymology = get_dictionary_data(lemma) #OED version
         word, definition_string, synonyms_string, examples_string, etymology = get_webster_dictionary_data(word_input)
@@ -25,39 +24,59 @@ def run(word_input, discovery_source_input, discovery_context_input, user, defin
         w.examples = examples_string
         w.etymology = etymology
         w.save()
-        v = VocabEntry.objects.create(word=w, discovery_source=discovery_source_input, discovery_context=discovery_context_input, user=user)
         if definition_string == "":# word is set to an empty string if not found in the dictionary
-            success = False #this is just for returning success variable later, it's okay that we added the word above anyway.
-            error_message = "The word {} could not be found in the dictionary.".format(word)
+            word_found_in_dictionary = False #this is just for returning success variable later, it's okay that we added the word above anyway.
         else:
-            success = True
+            word_found_in_dictionary = True
     else:
-        v, created = VocabEntry.objects.get_or_create(word=w)
-        if created:
+        word_found_in_dictionary = True# in this case, word was found in Word table
+    v, vocab_entry_already_existed_for_word = get_or_create_vocabentry(w, discovery_source_input, discovery_context_input, user, created, definition_override, synonyms_override, examples_override, etymology_override)
+    
+    print(f"vocab_entry_already_existed_for_word: {vocab_entry_already_existed_for_word}")
+    print(f"word_found_in_dictionary: {word_found_in_dictionary}")
+    return word_found_in_dictionary, vocab_entry_already_existed_for_word
+
+def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input, user, word_freshly_created, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):
+    if word_freshly_created:
+        v = VocabEntry.objects.create(
+            word=w,
+            discovery_source=discovery_source_input,
+            discovery_context=discovery_source_input,
+            user=user
+        )
+        vocab_entry_already_existed_for_word = False
+        # .create() saves
+    else:
+        v, vocab_entry_created = VocabEntry.objects.get_or_create(word=w)
+        if vocab_entry_created:
             v.user = user
             v.discovery_source = discovery_source_input
-            if definition_override:
-                v.definition_override = definition_override
-            if synonyms_override:
-                v.synonyms_override = synonyms_override
-            if examples_override:
-                v.examples_override = examples_override
-            if etymology_override:
-                v.etymology_override = etymology_override
-            if discovery_context_input:
-                v.discovery_context = discovery_context_input
-            v.save()
-            success = True
+            vocab_entry_already_existed_for_word = False
         else:
-            success = False
-            error_message = "The word {} already exists in your Vocab List.".format(w.word)
-    print("success: {}".format(success))
-    if not success:
-        print(error_message)
-    return success, error_message
+            vocab_entry_already_existed_for_word = True
+    
+    if not vocab_entry_already_existed_for_word:
+        if definition_override:
+            v.definition_override = definition_override
+        if synonyms_override:
+            v.synonyms_override = synonyms_override
+        if examples_override:
+            v.examples_override = examples_override
+        if etymology_override:
+            v.etymology_override = etymology_override
+        if discovery_context_input:
+            v.discovery_context = discovery_context_input
+        v.save()
+        return v, vocab_entry_already_existed_for_word
+    
+    else:
+        return None, vocab_entry_already_existed_for_word
 
-def get_lemma_for_word(word):
-    lemma = word # just passing it through for now, until OED API is working
+    
+
+
+# def get_lemma_for_word(word):
+    # lemma = word # just passing it through for now, until OED API is working
     # oed_base_url = 'https://od-api.oxforddictionaries.com/api/v2'
     # OED_APPLICATION_ID = os.getenv('OED_APPLICATION_ID')
     # OED_APPLICATION_KEY = os.getenv('OED_APPLICATION_KEY')
@@ -77,9 +96,9 @@ def get_lemma_for_word(word):
     # # below just gets the first lemma entry, so for words like 'learned' with two possible root words / lemmas, 
     # # the actual lemma entered will be 'learn' (the first lemma entry)
     # lemma = lemmas_response_json['results'][0]['lexicalEntries'][0]['inflectionOf'][0]['id']
-    return lemma
+    # return lemma
 
-def get_dictionary_data(word):
+# def get_dictionary_data(word):
     # oed_base_url = 'https://od-api.oxforddictionaries.com/api/v2'
     # headers = {'app_id':OED_APPLICATION_ID, 'app_key':OED_APPLICATION_KEY}
     # entries_url = '{}/entries/en/{}'.format(oed_base_url, word.lower())
@@ -139,17 +158,17 @@ def get_dictionary_data(word):
     # # examples_string = 'Most of the people in the class were tyros like me.; he\'s a good musician, but at 14, he\'s still a tyro and has a lot to learn'
     # # etymology = 'late Middle English: from Latin tiro, medieval Latin tyro "recruit"'
 
-    definition_string = "script def"
-    synonyms_string = "script synonyms"
-    examples_string = "script examples"
-    etymology = "script etymology"
+    # definition_string = "script def"
+    # synonyms_string = "script synonyms"
+    # examples_string = "script examples"
+    # etymology = "script etymology"
 
-    dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
-    return dictionary_data
+    # dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
+    # return dictionary_data
 
 def get_webster_dictionary_data(word):
     MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
-    url = "https://www.dictionaryapi.com/api/v3/references/collegiate/json/{}?key={}".format(word, MERRIAM_WEBSTER_DICTIONARY_KEY)
+    url = f"https://www.dictionaryapi.com/api/v3/references/collegiate/json/{word}?key={MERRIAM_WEBSTER_DICTIONARY_KEY}"
     response = requests.get(url)
     response_content_str = response.content.decode()
     response_content_list = json.loads(response_content_str)
@@ -188,7 +207,7 @@ def get_webster_dictionary_data(word):
                         examples.append(example)
     examples_string = "; ".join(examples)
     definition_string = "; ".join(definitions)
-    definition_string = '({}) {}'.format(part_of_speech, definition_string)
+    definition_string = f'({part_of_speech}) {definition_string}'
     synonyms_string = ""
     syns = word_dict.get("syns")
     if not syns:

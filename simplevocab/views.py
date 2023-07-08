@@ -61,7 +61,7 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
         discovery_source = form.cleaned_data["discovery_source"]
         discovery_context = form.cleaned_data["discovery_context"]
         user = self.request.user
-        success = add_vocabentry.run(word, discovery_source, discovery_context, user)
+        word_found_in_dictionary, vocab_entry_already_existed_for_word = add_vocabentry.run(word, discovery_source, discovery_context, user)
         #  add functionality to raise an error here (if success == False)
         return super().form_valid(form)
     
@@ -81,7 +81,8 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
                 raise Exception(
                     f"A required column is missing from the uploaded CSV: '{req_col}'"
                 )
-        errored_words = []
+        words_not_found_in_dictionary = []
+        words_where_vocab_entry_already_existed = []
         for row, item in enumerate(dict_reader, start=1):
             word = item.get("word")
             discovery_source = item.get("discovery_source", "Uploaded from previous vocab list")
@@ -90,10 +91,13 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
             synonyms_override = item.get("synonyms")
             examples_override = item.get("examples")
             etymology_override = item.get("etymology")
-            success, error_message = add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
-            if not success:
-                errored_words.append((word, error_message))
-        print("errored_words: {}".format(errored_words))# Show this to the user somehow (passed to some page as a message?)
+            word_found_in_dictionary, vocab_entry_already_existed_for_word = add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
+            if not word_found_in_dictionary:
+                words_not_found_in_dictionary.append((word))
+            if vocab_entry_already_existed_for_word:
+                words_where_vocab_entry_already_existed.append(word)
+        print("words_not_found_in_dictionary: {}".format(words_not_found_in_dictionary))# Show this to the user somehow (passed to some page as a message?)
+        print("words_where_vocab_entry_already_existed: {}".format(words_where_vocab_entry_already_existed))# Show this to the user somehow (passed to some page as a message?)
 
         return super().form_valid(form)
     
