@@ -113,7 +113,7 @@ DATABASES = {
         'PASSWORD': os.getenv('MYSQL_DB_PASSWORD'),
         'HOST': os.getenv('MYSQL_HOST'),
         'TEST': {
-          'NAME': 'coreyfein$test_vocabwebapp'
+          'NAME': os.getenv('MYSQL_TEST_DB_NAME')
         }
     }
 }
