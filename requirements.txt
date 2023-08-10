@@ -15,6 +15,7 @@ djangorestframework==3.14.0
 idna==3.4
 importlib-metadata==6.4.1
 Markdown==3.4.1
+mysqlclient-2.2.0
 mysql-connector-python==8.0.26
 oauthlib==3.2.2
 protobuf==3.17.3
