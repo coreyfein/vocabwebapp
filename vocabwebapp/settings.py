@@ -112,6 +112,9 @@ DATABASES = {
         'USER': os.getenv('MYSQL_USER'),
         'PASSWORD': os.getenv('MYSQL_DB_PASSWORD'),
         'HOST': os.getenv('MYSQL_HOST'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
         'TEST': {
           'NAME': os.getenv('MYSQL_TEST_DB_NAME')
         }
