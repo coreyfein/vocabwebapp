@@ -8,7 +8,7 @@ class VocabEntryUserInputForm(forms.Form):
         min_length = 1, 
         max_length=VocabEntry._meta.get_field("discovery_context").max_length,
         required=False,
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'class':'form-control'
             }
@@ -25,7 +25,7 @@ class VocabEntryUserInputForm(forms.Form):
     discovery_source = forms.CharField(
         min_length = 1, 
         max_length=VocabEntry._meta.get_field("discovery_source").max_length,
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
                 'class':'form-control'
             }
