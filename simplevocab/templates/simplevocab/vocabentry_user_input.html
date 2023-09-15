@@ -10,13 +10,13 @@
         src="{% static 'simplevocab/add_word_form.js' %}">
       </script><!-- remember to update STATIC_ROOT when deploying: https://docs.djangoproject.com/en/4.2/howto/static-files/ -->
       {% if field.name == "discovery_context" %}
-        <p>Paste the context where you found the word (one or two sentences including the word itself):</p>
+        <p>Enter the context where you found the word (one or two sentences including the word itself):</p>
         {{ field }}
         </br>
         </br>
         </br>
       {% elif field.name == "word"%}
-        <p>Type the word below, or if you've pasted the context above, you can select the word from this dropdown menu: <select class="form-select" id="wordlist">
+        <p>Type the word below, or if you've entered the context above, you can select the word from this dropdown menu: <select class="form-select" id="wordlist">
           <option value="" disabled selected>Select word</option>
         </select></p>
         {{ field }}
