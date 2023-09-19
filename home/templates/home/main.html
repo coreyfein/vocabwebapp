@@ -37,7 +37,7 @@
     <p>    
 
     <p>
-        See below for instructions on how to add a word from your computer or phone. If you read on an Apple device, you'll find that adding a word is particularly easy.
+        See below for instructions on how to add a word from your phone or computer. If you read on an Apple device, you'll find that adding a word is particularly easy.
     </p>
     </br>
 
@@ -46,7 +46,7 @@
     </br>
     </h4>
 
-    <p>The Vocab for Readers Shortcut makes it even easier to add words to your list. No need to open a tab in a browser -- 
+    <p>The Vocab for Readers Shortcut makes adding words to your list seamless. No need to open a tab in a browser -- 
         just copy the sentence and tap the icon on your home screen. </p></br>
 
     <h5>Setup</h5>
@@ -54,7 +54,7 @@
         <li>On your iPhone, download the <a href="https://www.icloud.com/shortcuts/c95ed76fbaec4f889a44cc0e5018aa56" download>Vocab for Readers Shortcut</a>.</li>
         <li>Tap "Add Shortcut" on the bottom of your screen. This will open up your Shortcuts app, which comes pre-installed on every iPhone by default. If you've deleted the Shortucts app, you'll be prompted to reinstall it.</li>
         <li>Tap the three-dot menu at the top right of the Shortcut you just installed ("Vocab For Readers"). This will open up the Shortcut.</li>
-        <li>At the bottom of your screen, click the share button.</li>
+        <li>At the bottom of your screen, tap the share button: <img class="inline-icon" src="{% static 'simplevocab/apple_share_icon.jpg' %}"></li>
         <li>Scroll down and tap "Add to Home Screen" and then confirm by tapping "Add" at the top right.</li>
     </ol>
     </br>
@@ -70,7 +70,7 @@
         <li>When prompted, enter where you discovered the word.</li>
         <li>When prompted, choose "Copied the word in context" if you copied the word within a sentence; choose "Copied just the word" if you only copied the word.</li>
         <li>When prompted, enter the word.</li>
-        <li>The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow."</li>
+        <li>The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow"</li>
         <li>This will open up your web browser to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page, with the discovery context and discovery source pre-filled.</li>
         <li>Select the word from the dropdown menu in the "Word" field, or type it in.</li>
         <li>Submit the form.</li>
@@ -80,7 +80,7 @@
     <ol>
         <li>Go to your home screen and tap the icon for the VocabForReaders Shortcut: <img class="inline-icon" src="{% static 'simplevocab/vocab_for_readers_icon.png' %}"></li>
         <li>When prompted, enter where you discovered the word.</li>
-        <li>When prompted, select "Didn't copy anything."</li>
+        <li>When prompted, select "Didn't copy anything"</li>
         <li>The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow."</li>
         <li>This will open up your web browser to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page, with your discovery source filled in.</li>
         <li>Enter the discovery context.</li>
@@ -115,9 +115,9 @@
         <li>Select and copy the sentence that includes the word you'd like to add.</li>
         <li>Click the Shortcuts icon in your menu bar (at the very top of your screen): <img class="inline-icon" src="{% static 'simplevocab/shortcuts_icon.png' %}"></li>
         <li>Click "Vocab for Readers"</li>
-        <li>When prompted, enter where you discovered the word</li>
-        <li>When prompted, choose "Copied the word in context" if you copied the word within a sentence; choose "Copied just the word" if you only copied the word</li>
-        <li>When prompted, enter the word</li>
+        <li>When prompted, enter where you discovered the word.</li>
+        <li>When prompted, choose "Copied the word in context" if you copied the word within a sentence; choose "Copied just the word" if you only copied the word.</li>
+        <li>When prompted, enter the word.</li>
         <li>The first time you submit those responses, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Always Allow."</li>
         <li>This will open up your web browser to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page, with the discovery context and discovery source pre-filled.</li>
         <li>Select the word from the dropdown menu in the "Word" field, or type it in.</li>
@@ -128,9 +128,9 @@
     <ol>
         <li>Click the Shortcuts icon in your menu bar (at the very top of your screen): <img class="inline-icon" src="{% static 'simplevocab/shortcuts_icon.png' %}"></li>
         <li>Click "Vocab for Readers"</li>
-        <li>When prompted, enter where you discovered the word</li>
-        <li>When prompted, select "Didn't copy anything" and click Done</li>
-        <li>The first time you use the shortcut, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Allow."</li>
+        <li>When prompted, enter where you discovered the word.</li>
+        <li>When prompted, select "Didn't copy anything" and click Done.</li>
+        <li>The first time you use the shortcut, you'll see a popup asking if you'd like to allow the shortcut to open your browser. Choose "Allow"</li>
         <li>This will open up your web browser to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page, with your discovery source filled in.</li>
         <li>Enter the discovery context.</li>
         <li>Select the word from the dropdown menu in the "Word" field, or type it in.</li>
@@ -142,15 +142,49 @@
         If the form isn't pre-filled, repeat the steps above once you're logged in.
     </p>
     </br>
+
+    <h4>
+        Android
+    </h4>
+
+    <h5>Setup</h5>
+
+    <ol>
+        <li>In Chrome, go to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page.</li>
+        <li>Tap the three-dot menu at the top right, then select "Add to Home screen" and name it.</li>
+        <li>Move the bookmark wherever you'd like on your home screen -- when you tap it, Chrome will open the Add a Word page.</li>
+    </ol>
+    </br>
+
+    <h5>Adding a Word</h5>
+    <ol>
+        <li>Select and copy the sentence that includes the word you'd like to add. If you weren't reading on this device, you can type the sentence instead in the next step.</li>
+        <li>Tap your shortcut to open the Add a Word page and paste (or type) the full sentence in the "Discovery Context" field. </li>
+        <li>Select the word from the dropdown menu in the "Word" field, or type it in.</li>
+        <li>Enter where you came across the word in the "Discovery Source" field.</li>
+    </ol>
+    <p>
+        The word will be added to your <a href="{% url 'simplevocab:all_vocabentries' %}">vocab list</a>, including your discovery context and the discovery source.
+    </p>
+    </br>
     
     <h4>
-        Desktop (non-Mac or Mac pre-Monterey 12.0) or Android
+        Desktop (non-Mac or Mac pre-Monterey 12.0)
     </h4>
+
+    <h5>Setup</h5>
+
     <p>In your browser, bookmark the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page for quick access.</p>
-    <p>Select and copy the sentence that includes the word you'd like to add.</p>
-    <p>Go to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page and paste the full sentence into the "Discovery Context" field. </p>
-    <p>Select the word from the dropdown menu in the "Word" field, or type it in.</p>
-    <p>Enter where you came across the word in the "Discovery Source" field.</p>
+
+    </br>
+
+    <h5>Adding a Word</h5>
+    <ol>
+        <li>Select and copy the sentence that includes the word you'd like to add. If you weren't reading on this device, you can type the sentence instead in the next step.</li>
+        <li>Go to the <a href="{% url 'simplevocab:vocabentry_create' %}">Add a Word</a> page and paste (or type) the full sentence in the "Discovery Context" field. </li>
+        <li>Select the word from the dropdown menu in the "Word" field, or type it in.</li>
+        <li>Enter where you came across the word in the "Discovery Source" field.</li>
+    </ol>
     <p>
         The word will be added to your <a href="{% url 'simplevocab:all_vocabentries' %}">vocab list</a>, including your discovery context and the discovery source.
     </p>
@@ -171,20 +205,43 @@
     <p>
         We'll use your quiz results to help decide what to quiz you on next.
     </p>
+
+    </br>
+
+    <h5> Quiz Reminders </h5>
+
     <p>
-        Soon, you'll be able to sign up for email reminders linking to your next quiz (and at some point, you'll be able to customize the frequency).
+        If you have an iPhone, create an Automation to remind you to take a quiz.
+        It takes 2 minutes to set up, and will make it much more likely that you'll quiz yourself regularly.
     </p>
+    <p>
+        For example, you might opt to receive a push notification on your iPhone every day at 8pm, reminding you to take a quiz. 
+        The notification links directly to the Quiz page.
+    </p>
+
+    <ol>
+        <li>Copy the Quiz page URL: http://www.vocabforreaders.com{% url 'simplevocab:quiz' %}</li>
+        <li>Open the Shortcuts app</li>
+        <li>Tap the Automation tab at the bottom</li>
+        <li>Tap the plus button at the top right to add a new Automation, then select "Create Personal Automation"</li>
+        <li>Tap "Time of Day" and choose the frequency and time of day for your Quiz reminder</li>
+        <li>Tap "Add Action" and then search for and select "Open URLs"</li>
+        <li>Paste the Add a Word URL in the URL field, then tap Next, and then Done</li>
+    </ol>
+
 </br>
+
     <h3>
-        View your vocab list
+        View and edit your vocab list
     </h3>
     <p>
         Your <a href="{% url 'simplevocab:all_vocabentries' %}">vocab list</a> shows all the words you've added along with stats showing how well you know them.
     </p>
     <p>
         While we try to retrieve synonyms, examples, and etymology for every word you add, sometimes it's not possible. 
-        You might also want to slightly edit the data we retrieve (e.g. adding another synonym to the ones we found). 
-        To update the vocab entry, click the "Update" button next to the word and follow the instructions on the page.
+        If you'd like, you can update the word to add these by clicking the "Update" button next to the word and following the instructions on the page.
+        You may also want to edit the data we retrieve (e.g. adding another synonym to the ones we found or replacing the definition with another sense of the word).
+        You can do all of that on the Update page.        
     </p>
 </br>
 </div>
