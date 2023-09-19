@@ -32,8 +32,9 @@ def run(user, words_per_quiz):
                     vocab_entry_streaks[user_response.vocab_entry]["streak"] += 1
                 else:
                     vocab_entry_streaks[user_response.vocab_entry]["streak_status"] = "ended"
-    quizzed_queue_no_cap = sorted(vocab_entry_streaks, key=lambda x: (-vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]), reverse=True)
-    # above sorts by -streak first, then most recent quiz date. that would make higher streaks first, then oldest most_recent_quiz_date. both are then reversed, making it sorted by lowest streak, then newest most_recent_quiz_date
+    quizzed_queue_no_cap = sorted(vocab_entry_streaks, key=lambda x: (vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]))
+    # Above sorts by streak first, then most recent quiz date. that makes lower streaks first, then oldest most_recent_quiz_date. 
+    # Used to have the most_recent_quiz_date sort be newest first, which resulted in words repeating in quizzes infinitely if you get everything right.
     if len(quizzed_queue_no_cap) >= words_per_quiz:
         quizzed_queue = quizzed_queue_no_cap[:words_per_quiz]# caps quizzed_queue at words_per_quiz if necessary
     else:
