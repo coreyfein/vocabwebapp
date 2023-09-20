@@ -1,5 +1,4 @@
 from simplevocab.models import Word, VocabEntry
-import sys
 import json
 import requests
 import re
@@ -71,9 +70,70 @@ def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input,
     else:
         return None, vocab_entry_already_existed_for_word
 
+def get_webster_dictionary_data(word):
+    MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
+    url = f"https://www.dictionaryapi.com/api/v3/references/collegiate/json/{word}?key={MERRIAM_WEBSTER_DICTIONARY_KEY}"
+    response = requests.get(url)
+    response_content_str = response.content.decode()
+    response_content_list = json.loads(response_content_str)
+    print(json.dumps(response_content_list, indent=4))
+    word_dict = response_content_list[0]
+    if isinstance(word_dict, str):
+        dictionary_data = (word, "", "", "", "")
+        return dictionary_data
+    word = word_dict["meta"]["id"].split(":")[0]
+    part_of_speech = word_dict["fl"]
+    senses = word_dict["def"][0]["sseq"]
+    definitions = []
+    definition_string = ""
+    examples = []
+    examples_string = ""
+    print(len(senses))
+    for sense_count, sense in enumerate(senses):
+        for sub_sense in sense:
+            print("sub_sense[0]:")
+            print(sub_sense[0])
+            if sub_sense[0] == "sense":
+                sense_dict = sub_sense[1]
+            elif sub_sense[0] == "bs":
+                sense_dict = sub_sense[1]["sense"]
+            elif sub_sense[0] == "pseq":
+                continue
+            definition_list = sense_dict["dt"]
+            for component in definition_list:
+                if component[0] == "text":
+                    definition = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+                    if len(definitions) <= 5:
+                        definitions.append(definition)
+                if component[0] == "vis":
+                    for example_dict in component[1]:
+                        example = re.sub(r'{.+?}', '', example_dict["t"])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+                        examples.append(example)
+    examples_string = "; ".join(examples)
+    definition_string = "; ".join(definitions)
+    definition_string = f'({part_of_speech}) {definition_string}'
+    synonyms_string = ""
+    syns = word_dict.get("syns")
+    if not syns:
+        # print("No synonyms found")
+        pass
+    else:
+        synonyms_list = syns[0]["pt"][0]
     
+        for count, component in enumerate(synonyms_list):
+            if component == "text":
+                synonyms_string = synonyms_list[count + 1].replace("{/sc} {sc}", ", ").replace("{/sc}", "")
+                synonyms_string = re.sub(r'{.+?}', '', synonyms_string)# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+    etymology = ""
+    etymology_list = word_dict.get("et", [])
+    for component in etymology_list:
+        if component[0] == "text":
+            etymology = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+    dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
+    print(dictionary_data)
+    return dictionary_data
 
-
+# Oxford English Dictionary (no longer available free):
 # def get_lemma_for_word(word):
     # lemma = word # just passing it through for now, until OED API is working
     # oed_base_url = 'https://od-api.oxforddictionaries.com/api/v2'
@@ -164,71 +224,6 @@ def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input,
 
     # dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
     # return dictionary_data
-
-def get_webster_dictionary_data(word):
-    MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
-    url = f"https://www.dictionaryapi.com/api/v3/references/collegiate/json/{word}?key={MERRIAM_WEBSTER_DICTIONARY_KEY}"
-    response = requests.get(url)
-    response_content_str = response.content.decode()
-    response_content_list = json.loads(response_content_str)
-    print(json.dumps(response_content_list, indent=4))
-    word_dict = response_content_list[0]
-    if isinstance(word_dict, str):
-        dictionary_data = (word, "", "", "", "")
-        return dictionary_data
-    word = word_dict["meta"]["id"].split(":")[0]
-    part_of_speech = word_dict["fl"]
-    senses = word_dict["def"][0]["sseq"]
-    definitions = []
-    definition_string = ""
-    examples = []
-    examples_string = ""
-    print(len(senses))
-    for sense_count, sense in enumerate(senses):
-        for sub_sense in sense:
-            print("sub_sense[0]:")
-            print(sub_sense[0])
-            if sub_sense[0] == "sense":
-                sense_dict = sub_sense[1]
-            elif sub_sense[0] == "bs":
-                sense_dict = sub_sense[1]["sense"]
-            elif sub_sense[0] == "pseq":
-                continue
-            definition_list = sense_dict["dt"]
-            for component in definition_list:
-                if component[0] == "text":
-                    definition = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-                    if len(definitions) <= 5:
-                        definitions.append(definition)
-                if component[0] == "vis":
-                    for example_dict in component[1]:
-                        example = re.sub(r'{.+?}', '', example_dict["t"])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-                        examples.append(example)
-    examples_string = "; ".join(examples)
-    definition_string = "; ".join(definitions)
-    definition_string = f'({part_of_speech}) {definition_string}'
-    synonyms_string = ""
-    syns = word_dict.get("syns")
-    if not syns:
-        # print("No synonyms found")
-        pass
-    else:
-        synonyms_list = syns[0]["pt"][0]
-    
-        for count, component in enumerate(synonyms_list):
-            if component == "text":
-                synonyms_string = synonyms_list[count + 1].replace("{/sc} {sc}", ", ").replace("{/sc}", "")
-                synonyms_string = re.sub(r'{.+?}', '', synonyms_string)# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-    etymology = ""
-    etymology_list = word_dict.get("et", [])
-    for component in etymology_list:
-        if component[0] == "text":
-            etymology = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-    dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
-    print(dictionary_data)
-    return dictionary_data
-    
-    
 
 if __name__ == "__main__":
     run()
