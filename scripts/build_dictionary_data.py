@@ -11,7 +11,7 @@ def get_webster_data(word):
     webster_response = requests.get(url)
     webster_response_content_str = webster_response.content.decode()
     webster_top_level_list = json.loads(webster_response_content_str)
-    if isinstance(webster_top_level_list[0], str):
+    if webster_top_level_list == [] or isinstance(webster_top_level_list[0], str):
         print("Word not found in Webster dictionary")
         return False, False
     else:
