@@ -1,4 +1,4 @@
-from simplevocab.models import Word, VocabEntry
+#from simplevocab.models import Word, VocabEntry
 import json
 import requests
 import re
@@ -13,8 +13,8 @@ def run(word_input, discovery_source_input, discovery_context_input, user, defin
     print(f"word id: {str(w.id)}")
     print(f"Created: {created}")
     if created:
-        # word, definition_string, synonyms_string, examples_string, etymology = get_dictionary_data(lemma) #OED version
-        word, definition_string, synonyms_string, examples_string, etymology = get_webster_dictionary_data(word_input)
+        # word, definition_string, synonyms_string, examples_string, etymology = get_oed_dictionary_data(lemma)
+        word, definition_string, synonyms_string, examples_string, etymology = build_dictionary_data(word_input)
         # when triggered by a form, also pass in user to the created_by field in new Word record
         w.created_by = user
         w.word = word
@@ -69,68 +69,546 @@ def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input,
     
     else:
         return None, vocab_entry_already_existed_for_word
-
-def get_webster_dictionary_data(word):
+    
+def get_webster_data(word):
     MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
     url = f"https://www.dictionaryapi.com/api/v3/references/collegiate/json/{word}?key={MERRIAM_WEBSTER_DICTIONARY_KEY}"
-    response = requests.get(url)
-    response_content_str = response.content.decode()
-    response_content_list = json.loads(response_content_str)
-    print(json.dumps(response_content_list, indent=4))
-    word_dict = response_content_list[0]
-    if isinstance(word_dict, str):
-        dictionary_data = (word, "", "", "", "")
-        return dictionary_data
-    word = word_dict["meta"]["id"].split(":")[0]
-    part_of_speech = word_dict["fl"]
-    senses = word_dict["def"][0]["sseq"]
-    definitions = []
-    definition_string = ""
-    examples = []
-    examples_string = ""
-    print(len(senses))
-    for sense_count, sense in enumerate(senses):
-        for sub_sense in sense:
-            print("sub_sense[0]:")
-            print(sub_sense[0])
-            if sub_sense[0] == "sense":
-                sense_dict = sub_sense[1]
-            elif sub_sense[0] == "bs":
-                sense_dict = sub_sense[1]["sense"]
-            elif sub_sense[0] == "pseq":
-                continue
-            definition_list = sense_dict["dt"]
-            for component in definition_list:
-                if component[0] == "text":
-                    definition = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-                    if len(definitions) <= 5:
-                        definitions.append(definition)
-                if component[0] == "vis":
-                    for example_dict in component[1]:
-                        example = re.sub(r'{.+?}', '', example_dict["t"])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-                        examples.append(example)
-    examples_string = "; ".join(examples)
-    definition_string = "; ".join(definitions)
-    definition_string = f'({part_of_speech}) {definition_string}'
-    synonyms_string = ""
-    syns = word_dict.get("syns")
-    if not syns:
-        # print("No synonyms found")
-        pass
+    webster_response = requests.get(url)
+    webster_response_content_str = webster_response.content.decode()
+    webster_top_level_list = json.loads(webster_response_content_str)
+    if isinstance(webster_top_level_list[0], str):
+        print("Word not found in Webster dictionary")
+        return False, False
     else:
-        synonyms_list = syns[0]["pt"][0]
-    
-        for count, component in enumerate(synonyms_list):
-            if component == "text":
-                synonyms_string = synonyms_list[count + 1].replace("{/sc} {sc}", ", ").replace("{/sc}", "")
-                synonyms_string = re.sub(r'{.+?}', '', synonyms_string)# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
+        first_entry_id = webster_top_level_list[0]["meta"]["id"].split(":")[0]
+        entry_with_same_id_and_with_more_common_spelling_exists = False
+        entry_with_same_id_and_without_more_common_spelling_exists = False
+        for entry in webster_top_level_list:
+            if entry.get("cxs"):# If a "cross reference target" array (more common spelling) exists
+                if not entry_with_same_id_and_with_more_common_spelling_exists and entry["meta"]["id"].split(":")[0] == first_entry_id: # if we haven't found one already in another entry
+                    more_common_spelling = entry["cxs"][0]["cxtis"][0].get("cxt")# haven't seen example of cxtis array with len > 1, just assume the first one is the one to use
+                    entry_with_same_id_and_with_more_common_spelling_exists = True
+            else:
+                if entry["meta"]["id"].split(":")[0] == first_entry_id:# if it doesn't pass this test, it's just the entry for the more common spelling tacked on, so there isn't actually a unique meaning for the spelling
+                    lemma_for_entry_without_more_common_spelling = entry["meta"]["id"].split(":")[0]
+                    entry_with_same_id_and_without_more_common_spelling_exists = True
+        if entry_with_same_id_and_with_more_common_spelling_exists:
+            if not entry_with_same_id_and_without_more_common_spelling_exists:# if all entries point to a more common spelling, with no unique entries for this spelling (e.g. "forbode" would pass this test but "baloney" would not, since it has its own meaning, not just a secondary spelling for "bologna")
+                lemma = more_common_spelling
+            else: # at least one entry with a more common spelling exist, but there is also a unique entry for this spelling (e.g. "baloney" has its own meaning, not just a secondary spelling for "bologna")
+                lemma = lemma_for_entry_without_more_common_spelling
+
+        else:
+            lemma = first_entry_id
+
+        print(f"lemma: {lemma}")
+        return lemma, webster_top_level_list
+
+def get_wordsapi_data(lemma):
+    RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
+    wordsapi_url = f"https://wordsapiv1.p.rapidapi.com/words/{lemma}"
+    headers = {
+        "X-RapidAPI-Key": "70d1a563a7msh45edbe057268788p17ec20jsn49d9b58011e2",
+        "X-RapidAPI-Host": "wordsapiv1.p.rapidapi.com"
+    }
+    wordsapi_response = requests.get(wordsapi_url, headers=headers)
+    wordsapi_data = json.loads(wordsapi_response.content)
+    return wordsapi_data
+
+def extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums, exclude_example_result_nums):
+    definition_str = ""
+    synonyms_str = ""
+    synonyms_list = []# used to check for duplicates across results
+    examples_str = ""
+    for count, result in enumerate(wordsapi_data["results"]):
+        result_num = count + 1
+        if len(wordsapi_data["results"]) > 1:
+            result_num_prefix = f"{result_num}. "
+        else:
+            result_num_prefix = ""
+
+        if result_num != len(wordsapi_data["results"]):
+            result_str_suffix = " "
+        else:
+            result_str_suffix = ""
+        
+        part_of_speech = result.get("partOfSpeech", "")
+        if part_of_speech == "":
+            part_of_speech_prefix = ""
+        else:
+            part_of_speech_prefix = f"({part_of_speech}) "
+
+        definition = result.get("definition", "")
+        definition_str += result_num_prefix + part_of_speech_prefix + definition + result_str_suffix
+        
+        synonyms_list_this_result = result.get("synonyms", [])
+        if len(synonyms_list_this_result) > 0 and not exclude_synonym_result_nums:
+            synonyms_str += result_num_prefix
+        count = 0
+        for synonym in synonyms_list_this_result:
+            if synonym in synonyms_list:
+                continue
+            
+            if count > 0:
+                synonym_prefix = ", "
+            else:
+                synonym_prefix = ""
+            synonyms_str += synonym_prefix + synonym
+            synonyms_list.append(synonym)
+
+            count += 1# can't just enumerate since we're skipping some
+
+        if exclude_synonym_result_nums:
+            synonym_str_suffix = result_str_suffix.replace(" ", "; ")
+        else:
+            synonym_str_suffix = result_str_suffix
+        if len(synonyms_list_this_result) > 0:
+            synonyms_str += synonym_str_suffix
+
+        examples_list = result.get("examples", [])
+        if len(examples_list) > 0 and not exclude_example_result_nums:
+            examples_str += result_num_prefix
+        for count, example in enumerate(examples_list):
+            if count > 0:
+                example_prefix = "; "
+            else:
+                example_prefix = ""
+            examples_str += example_prefix + example
+        if exclude_example_result_nums:
+            example_str_suffix = result_str_suffix.replace(" ", "; ")
+        else:
+            example_str_suffix = result_str_suffix
+        if len(examples_list) > 0:
+            examples_str += example_str_suffix
+
+    definition_str = definition_str.strip()
+    if definition_str.endswith(";"):
+        definition_str = definition_str[:-1]
+
+    synonyms_str = synonyms_str.strip()
+    if synonyms_str.endswith(";"):
+        synonyms_str = synonyms_str[:-1]
+
+    examples_str = examples_str.strip()
+    if examples_str.endswith(";"):
+        examples_str = examples_str[:-1]
+
+    return definition_str, synonyms_str, examples_str
+
+def extract_webster_data(webster_top_level_list):
+    definition_str = ""
+    synonyms_str = ""
+    examples_str = ""
     etymology = ""
-    etymology_list = word_dict.get("et", [])
-    for component in etymology_list:
-        if component[0] == "text":
-            etymology = re.sub(r'{.+?}', '', component[1])# the regex replaces all text between consecutive { and } (and the braces themselves) with an empty string
-    dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
-    print(dictionary_data)
+    entry_num = 0
+
+    total_entries = 0
+    for entry in webster_top_level_list:
+        if entry.get("cxs"): # if "csx" array exists, skip that entry (use the entry with the more common spelling instead -- otherwise there will be duplicate definitions etc)
+            pass
+        else:
+            total_entries += 1
+
+    for entry in webster_top_level_list:
+        if entry.get("cxs"): # if "csx" array exists, skip that entry (use the entry with the more common spelling instead -- otherwise there will be duplicate definitions etc)
+            continue
+        
+        # Below, if the "id" for this entry is different than the main "id". e.g. "sow" has an entry with "id" == "self-sow" and "baloney" has an entry with "id" == "bologna". 
+        # It's impossible to decide whether to skip or not (would want to skip "self-sow" but not "bologna", e.g.), so just put the different "id" in brackets at the beginning of the definition
+        entry_id = entry["meta"]["id"].split(":")[0]
+        different_id_from_first_entry_prefix = ""
+        if entry_id != webster_top_level_list[0]["meta"]["id"].split(":")[0]:
+            different_id_from_first_entry_prefix = f"[{entry_id}] "
+
+        
+
+        entry_num += 1 # don't just enumerate the for loop since we are skipping some entries above
+
+        part_of_speech = entry.get("fl")
+        if not part_of_speech:
+            part_of_speech_prefix = ""
+        else:
+            part_of_speech_prefix = f"({part_of_speech}) "
+        
+        if total_entries > 1:
+            entry_num_prefix = f"{entry_num}. "
+        else:
+            entry_num_prefix = ""
+
+        try:
+            definition_sense_sequence = entry["def"][0]["sseq"]
+        except:
+            continue
+            
+        examples_this_entry = []
+        definitions_this_entry_str = ""
+        synonyms_this_entry_str = ""
+        total_senses_in_definition_sense_sequence = 0
+        for sense in definition_sense_sequence:
+            for sub_sense in sense:
+                total_senses_in_definition_sense_sequence += 1
+        for sense_count, sense in enumerate(definition_sense_sequence):
+            sense_num = sense_count + 1
+            bs_this_entry = False
+            for sub_sense in sense:
+                if sub_sense[0] == "pseq":# "pseq" includes optional "bs" followed by at least one "sense" for which the value of "sn" (pseq number in parentheses) should be included before the text
+                    definitions_this_pseq_str = ""
+                    parenthesized_sequence = sub_sense[1]
+                    for sub_pseq_count, sub_pseq in enumerate(parenthesized_sequence): 
+                        sub_pseq_num = sub_pseq_count + 1
+                        if sub_pseq[0] == "bs":# ends in such as, examples follow
+                            sense_dict = sub_pseq[1]["sense"]
+                            sense_definition_text_list = sense_dict["dt"]
+                            for component in sense_definition_text_list:
+                                if component[0] == "text":
+                                    definitions_this_pseq_str += clean_webster_text(component[1])
+                                    if sub_pseq_num != len(parenthesized_sequence):
+                                        definitions_this_pseq_str += " "
+                                if component[0] == "vis":
+                                    author = ""
+                                    for example_dict in component[1]:
+                                        author_dict = example_dict.get("aq", {})
+                                        if author_dict != {}:
+                                            author = clean_webster_text(author_dict.get("auth", ""))
+                                            if author != "":
+                                                author = f" ({author})"
+                                        examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                        elif sub_pseq[0] == "sense":# examples following "bs"
+                            sense_dict = sub_pseq[1]
+                            sense_definition_text_list = sense_dict["dt"]
+                            pseq_num_str = sense_dict["sn"]
+                            for component in sense_definition_text_list:
+                                if component[0] == "text":
+                                    definitions_this_pseq_str += " " + pseq_num_str + " " + clean_webster_text(component[1])
+                                    definitions_this_pseq_str = definitions_this_pseq_str.replace("  ", " ")
+                                    if sub_pseq_num == len(parenthesized_sequence) and sense_num != total_senses_in_definition_sense_sequence:# last in a pseq but not last in definition_sense_sequence
+                                        definitions_this_pseq_str += "; "
+                                if component[0] == "ca":
+                                    called_also_text_dicts_list = component[1]["cats"]
+                                    called_also_text_list = []
+                                    for called_also_text_dict in called_also_text_dicts_list:
+                                        called_also_text_list.append(called_also_text_dict["cat"])
+                                    called_also_text_str = ", ".join(called_also_text_list)
+                                    called_also_text_str = clean_webster_text(called_also_text_str)
+                                    if definitions_this_pseq_str[-2:] == "; ":
+                                        definitions_this_pseq_str = definitions_this_pseq_str[:-2] + f", also called {called_also_text_str}; "
+                                    else:
+                                        definitions_this_pseq_str = definitions_this_pseq_str + f", also called {called_also_text_str}"
+                                if component[0] == "uns":
+                                    for uns_component in component[1][0]:
+                                        if uns_component[0] == "text":
+                                            usage_note = clean_webster_text(uns_component[1])
+                                            break
+                                    if definitions_this_pseq_str[-2:] == "; ":
+                                        definitions_this_pseq_str = definitions_this_pseq_str[:-2] + f" ({usage_note}); "
+                                    else:
+                                        definitions_this_pseq_str = definitions_this_pseq_str + f" ({usage_note})"
+                                if component[0] == "vis":
+                                    for example_dict in component[1]:
+                                        author = ""
+                                        author_dict = example_dict.get("aq", {})
+                                        if author_dict != {}:
+                                            author = clean_webster_text(author_dict.get("auth", ""))
+                                            if author != "":
+                                                author = f" ({author})"
+                                        author = clean_webster_text(example_dict.get("aq", ""))
+                                        if author != "":
+                                            author = f" ({author})"
+                                        examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                        
+                        # Regardless of whether the sense is "bs" or "sense", account for adding "sdsense" to the definition text if it's present
+                        if sense_dict.get("sdsense"):
+                            sense_divider = sense_dict["sdsense"]["sd"]# something like "specifically"
+                            for component in sense_dict["sdsense"]["dt"]:
+                                if component[0] == "text":
+                                    sd_text = clean_webster_text(component[1])
+                                    definitions_this_pseq_str += f", {sense_divider} {sd_text}"
+                                    if sub_pseq_num != len(parenthesized_sequence):
+                                        definitions_this_pseq_str += "; "
+                                if component[0] == "vis":
+                                    for example_dict in component[1]:
+                                        author = ""
+                                        author_dict = example_dict.get("aq", {})
+                                        if author_dict != {}:
+                                            author = clean_webster_text(author_dict.get("auth", ""))
+                                            if author != "":
+                                                author = f" ({author})"
+                                        examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+
+                    definitions_this_entry_str += f"{definitions_this_pseq_str}"
+
+                # Below: "bs" not within a "pseq" MAY be followed by at least one "sense" for which the value of "sn" (letter not yet in parentheses) should be included before the text; 
+                # OR it may just have a "sdsense" within the sense_dict alongside "dt" which should be appended to the "dt" text, just like if it were within a "pseq"
+                elif sub_sense[0] == "bs":
+                    bs_this_entry = True
+                    definitions_this_bs_str = ""
+                    sense_dict = sub_sense[1]["sense"]
+                    sense_definition_text_list = sense_dict["dt"]
+                    for component in sense_definition_text_list:
+                        if component[0] == "text":
+                            definitions_this_bs_str += clean_webster_text(component[1])
+                        if component[0] == "vis":
+                            author = ""
+                            author_dict = example_dict.get("aq", {})
+                            if author_dict != {}:
+                                author = clean_webster_text(author_dict.get("auth", ""))
+                                if author != "":
+                                    author = f" ({author})"
+                            for example_dict in component[1]:
+                                examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                    if sense_dict.get("sdsense"):
+                        sense_divider = sense_dict["sdsense"]["sd"]# something like "specifically"
+                        for component in sense_dict["sdsense"]["dt"]:
+                            if component[0] == "text":
+                                sd_text = clean_webster_text(component[1])
+                                definitions_this_bs_str += f", {sense_divider} {sd_text}"
+                            if component[0] == "vis":
+                                for example_dict in component[1]:
+                                    author = ""
+                                    author_dict = example_dict.get("aq", {})
+                                    if author_dict != {}:
+                                        author = clean_webster_text(author_dict.get("auth", ""))
+                                        if author != "":
+                                            author = f" ({author})"
+                                    examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                    definitions_this_entry_str += definitions_this_bs_str
+
+                elif sub_sense[0] == "sense":
+                    definitions_this_sense_str = ""
+                    sense_dict = sub_sense[1]
+                    sense_definition_text_list = sense_dict["dt"]
+                    for component in sense_definition_text_list:
+                        if component[0] == "text":
+                            if bs_this_entry:# if this sense follows a "bs"
+                                bsseq_num_str = sense_dict.get("sn", "")
+                                bsseq_num_str = f" ({bsseq_num_str}) "
+                                definitions_this_sense_str += bsseq_num_str + clean_webster_text(component[1])
+                            else:
+                                definitions_this_sense_str += clean_webster_text(component[1])
+                                if not sense_dict.get("sdsense"):
+                                    definitions_this_sense_str += "; "
+                        if component[0] == "ca":
+                            called_also_text_dicts_list = component[1]["cats"]
+                            called_also_text_list = []
+                            for called_also_text_dict in called_also_text_dicts_list:
+                                called_also_text_list.append(called_also_text_dict["cat"])
+                            called_also_text_str = ", ".join(called_also_text_list)
+                            called_also_text_str = clean_webster_text(called_also_text_str)
+                            if definitions_this_sense_str[-2:] == "; ":
+                                definitions_this_sense_str = definitions_this_sense_str[:-2] + f", also called {called_also_text_str}; "
+                            else:
+                                definitions_this_sense_str = definitions_this_sense_str + f", also called {called_also_text_str}"
+                        if component[0] == "uns":
+                            for uns_component in component[1][0]:
+                                if uns_component[0] == "text":
+                                    usage_note = clean_webster_text(uns_component[1])
+                                    break
+                            if definitions_this_sense_str[-2:] == "; ":
+                                definitions_this_sense_str = definitions_this_sense_str[:-2] + f" ({usage_note}); "
+                            else:
+                                definitions_this_sense_str = definitions_this_sense_str + f" ({usage_note})"
+                        if component[0] == "vis":
+                            for example_dict in component[1]:
+                                author = ""
+                                author_dict = example_dict.get("aq", {})
+                                if author_dict != {}:
+                                    author = clean_webster_text(author_dict.get("auth", ""))
+                                    if author != "":
+                                        author = f" ({author})"
+                                examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                    if sense_dict.get("sdsense"):
+                        sense_divider = sense_dict["sdsense"]["sd"]# something like "specifically" or "also"
+                        for component in sense_dict["sdsense"]["dt"]:
+                            if component[0] == "text":
+                                sd_text = clean_webster_text(component[1])
+                                definitions_this_sense_str += f", {sense_divider} {sd_text}"
+                    definitions_this_entry_str += definitions_this_sense_str
+
+        quotes = entry.get("quotes", [])
+        for quote_dict in quotes:
+            author = ""
+            author_dict = quote_dict.get("aq", {})
+            if author_dict != {}:
+                author = clean_webster_text(author_dict.get("auth", ""))
+                if author != "":
+                    author = f" ({author})"
+            examples_this_entry.append(clean_webster_text(quote_dict["t"]) + author)
+
+        syns = entry.get("syns")
+        if syns:
+            synonyms_lists = syns[0]["pt"]
+            synonyms_text_total_qty = 0
+            for synonyms_list in synonyms_lists:
+                if synonyms_list[0] == "text":
+                    synonyms_text_total_qty += 1
+
+            synonyms_text_count = 0
+            for synonyms_list in synonyms_lists:
+                if synonyms_list[0] == "text":
+                    synonyms_text_count += 1
+                    synonyms_this_entry_str += clean_webster_text(synonyms_list[1].replace("{/sc} {sc}", ", ")) + "; "
+
+        if entry_num != total_entries:
+            entry_str_suffix = "\n"
+        else:
+            entry_str_suffix = ""    
+        
+        definitions_this_entry_str = definitions_this_entry_str.strip()
+        if definitions_this_entry_str.endswith(";"):# easier to remove at this point than to figure out which sense is the last one
+            definitions_this_entry_str = definitions_this_entry_str[:-1]
+
+        definition_str += entry_num_prefix + part_of_speech_prefix  + different_id_from_first_entry_prefix + definitions_this_entry_str + entry_str_suffix
+
+        if synonyms_this_entry_str != "":
+
+            synonyms_this_entry_str = synonyms_this_entry_str.strip()
+            if synonyms_this_entry_str.endswith(";"):# easier to remove at this point than to figure out which sense is the last one
+                synonyms_this_entry_str = synonyms_this_entry_str[:-1]
+            synonyms_str += entry_num_prefix + different_id_from_first_entry_prefix + synonyms_this_entry_str + entry_str_suffix
+
+        if examples_this_entry != []:
+            examples_this_entry_str = "; ".join(examples_this_entry)
+            examples_str += entry_num_prefix + different_id_from_first_entry_prefix + examples_this_entry_str + entry_str_suffix
+
+        etymology_list = entry.get("et", [])
+        for component in etymology_list:
+            if component[0] == "text" and etymology == "" and component[1] != "origin unknown":# only set etymology once (from within the first entry where one is found). etymologies for other entries tend to just refer to the first entry.
+                etymology = clean_webster_text(component[1])
+
+    return clean_webster_text(definition_str), clean_webster_text(synonyms_str), clean_webster_text(examples_str), clean_webster_text(etymology)
+
+def clean_webster_text(raw_str):
+    cleaned_str = raw_str.strip()
+    tokens_to_remove_but_keep_text_between_tokens = ["{b}", "{/b}", "{bc}", "{inf}", "{/inf}", "{it}", "{/it}", "{ldquo}", "{rdquo}", "{sc}", "{/sc}", "{sup}", "{wi}", "{/wi}", "{parahw}", "{/parahw}", "{phrase}", "{/phrase}", "{qword}", "{/qword}", "{mat}"]
+    # ^removing {mat} above, which only exists within {ma} tokens. Then remove text within {ma} tokens which would've otherwise included the {mat} tokens
+    for token in tokens_to_remove_but_keep_text_between_tokens:
+        cleaned_str = cleaned_str.replace(token, "")
+        
+    tokens_to_replace_with_parentheses = ["{dx}", "{dx_def}", "{dx_ety}"]
+    for token_start in tokens_to_replace_with_parentheses:
+        token_end = token_start.replace("{", "{/")
+        cleaned_str = cleaned_str.replace(token_start, "(")
+        cleaned_str = cleaned_str.replace(token_end, ")")
+    
+    tokens_to_remove_and_remove_text_between_tokens = ["{gloss}", "{ma}"]
+    for token_start in tokens_to_remove_and_remove_text_between_tokens:
+        token_end = token_start.replace("{", "{/")
+        while token_start in cleaned_str:
+            next_token_start_index = cleaned_str.find(token_start)
+            next_token_end_index = cleaned_str.find(token_end, next_token_start_index - 1)
+            cleaned_str = cleaned_str[:next_token_start_index - 1] + cleaned_str[next_token_end_index + len(token_end):]
+                
+    tokens_to_strip_and_keep_text_within_same_bracket = ["a_link|", "d_link|", "i_link|", "et_link|", "sx|", "dxt|"]
+    for token in tokens_to_strip_and_keep_text_within_same_bracket:
+        total_count_this_token_pre_clean = cleaned_str.count(token)
+        this_token_found_count = 0
+        while token in cleaned_str:
+            this_token_found_count += 1
+            next_token_index = cleaned_str.find(token)
+            next_closing_curly_brace_index = cleaned_str.find("}", next_token_index - 1)
+            token_str_to_keep = cleaned_str[next_token_index + len(token):next_closing_curly_brace_index]
+            token_str_to_keep = token_str_to_keep.split("|")[0]
+            token_str_to_keep = token_str_to_keep.split(":")[0]
+            if token == "sx|":# usually meant to be in parentheses, it's a "link" to a synonym. at end of function, will remove parentheses if the whole thing would be in parentheses otherwise
+                if total_count_this_token_pre_clean == 1:
+                    token_str_to_keep = f"({token_str_to_keep})"# both ()
+                else:
+                    if this_token_found_count == 1:
+                        token_str_to_keep = f"({token_str_to_keep}"# open ( only
+                    if this_token_found_count == total_count_this_token_pre_clean:
+                        token_str_to_keep = f"{token_str_to_keep})"# closed ) only
+            cleaned_str = cleaned_str[:next_token_index - 1] + token_str_to_keep + cleaned_str[next_closing_curly_brace_index + 1:]
+
+    # ignore {ds} token since that's only within "date" (as in date first seen, which isn't used at all)
+    for bad_start_end_str in [" ", ",", ";", ":", "-", "|"]:
+        cleaned_str = cleaned_str.strip(bad_start_end_str)
+    cleaned_str = cleaned_str.replace(", ,", ",")
+    cleaned_str = cleaned_str.replace("; ;", ";")
+    cleaned_str = cleaned_str.replace(" ;", ";")
+
+    #after fully cleaning, check if it starts and ends with parentheses (and only has one set), and remove them if so. this is mostly for definitions that are just sx| tokens:
+    if cleaned_str.count("(") == 1 and cleaned_str.count(")") == 1 and cleaned_str[0] == "(" and cleaned_str[-1] == ")":
+        cleaned_str = cleaned_str[1:-1]
+
+    return cleaned_str
+
+def build_dictionary_data(word):
+    """
+    1. Call to Webster API, retrieve lemma ('id')
+    2. Call to WordsAPI with lemma
+    3. For each WordsAPI "result":
+    - if len(results) > 1, include number in definition_str, synonyms_str, examples_str
+    - generate definition_str e.g. for "augur": (noun) indicate, as with a sign or omen
+    - append definition_str to definitions in dictionary_data dict
+    - (later, if no results, get shortdef from Webster)
+    - generate synonyms_str (include all synonyms for each result)
+    - (later, if no results, get synonyms from Webster)
+    - generate examples_str (include all examples for each result)
+    - (later, if no results, get examples/quotes from Webster)
+    4. In Webster API response, for each main entry:
+    - Get etymology. Look for 'et' -- stop after finding one.
+    - If definition_str is empty, look for 'shortdef' (format line breaks) -- if not there, look for 'def' and stop after finding one.
+    - If synonyms_str is empty, look for 'syn' -- stop after finding one.
+    - If examples_str is empty, look for 'vis' within 'def' and look for 'quotes'
+    """
+
+    lemma, webster_top_level_list = get_webster_data(word)
+    if not lemma:# word not found at Webster
+        print("Word not found at Webster")
+        wordsapi_data = get_wordsapi_data(word)# check word (whatever they submitted) instead of lemma, since didn't get lemma from webster
+        if wordsapi_data.get("message") == "word not found" or not wordsapi_data.get("results"):# word not found at WordsAPI
+            print ("Word not found at WordsAPI")
+            dictionary_data = (word, "", "", "", "")
+        else:
+            wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str = extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums=False, exclude_example_result_nums=False)
+            dictionary_data = (word, wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str, "")
+            
+
+    else:# found word at webster  
+        webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology = extract_webster_data(webster_top_level_list)
+        print(f"webster_definition_str: {webster_definition_str}")
+        print(f"webster_synonyms_str: {webster_synonyms_str}")
+        print(f"webster_examples_str: {webster_examples_str}")
+        print(f"webster_etymology: {webster_etymology}")
+
+        exclude_synonym_result_nums = False
+        exclude_example_result_nums = False
+        if webster_synonyms_str == "":
+            exclude_synonym_result_nums = True
+        if webster_examples_str == "":
+            exclude_example_result_nums = True
+        
+        if exclude_synonym_result_nums or exclude_example_result_nums:
+            wordsapi_data = get_wordsapi_data(lemma)
+            
+            if wordsapi_data.get("message") == "word not found" or not wordsapi_data.get("results"):# word not found at WordsAPI
+                dictionary_data = (lemma, webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology)
+            else:
+                wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str = extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums, exclude_example_result_nums)
+                print(f"wordsapi_definition_str: {wordsapi_definition_str}")
+                print(f"wordsapi_synonyms_str: {wordsapi_synonyms_str}")
+                print(f"wordsapi_examples_str: {wordsapi_examples_str}")
+
+                if exclude_synonym_result_nums:
+                    synonyms_str = wordsapi_synonyms_str
+                else:
+                    synonyms_str = webster_synonyms_str
+
+                if exclude_example_result_nums:
+                    examples_str = wordsapi_examples_str
+                else:
+                    examples_str = webster_examples_str
+
+                dictionary_data = (lemma, webster_definition_str, synonyms_str, examples_str, webster_etymology)
+
+        else:
+            dictionary_data = (lemma, webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology)
+
+    print("Lemma: " + dictionary_data[0])
+    print("Final definition: " + dictionary_data[1])
+    print("Final synonyms: " + dictionary_data[2])
+    print("Final examples: " + dictionary_data[3])
+    print("Final etymology: " + dictionary_data[4])
     return dictionary_data
 
 # Oxford English Dictionary (no longer available free):
@@ -157,7 +635,7 @@ def get_webster_dictionary_data(word):
     # lemma = lemmas_response_json['results'][0]['lexicalEntries'][0]['inflectionOf'][0]['id']
     # return lemma
 
-# def get_dictionary_data(word):
+# def get_oed_dictionary_data(word):
     # oed_base_url = 'https://od-api.oxforddictionaries.com/api/v2'
     # headers = {'app_id':OED_APPLICATION_ID, 'app_key':OED_APPLICATION_KEY}
     # entries_url = '{}/entries/en/{}'.format(oed_base_url, word.lower())
@@ -226,4 +704,7 @@ def get_webster_dictionary_data(word):
     # return dictionary_data
 
 if __name__ == "__main__":
-    run()
+    # UNCOMMENT THIS LINE run()
+    word = input("Enter word > ")
+    build_dictionary_data(word)
+    # monitor, feline, abaca, abeyance, absence, baloney, sown, forbode
