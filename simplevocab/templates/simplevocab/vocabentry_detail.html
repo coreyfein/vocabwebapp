@@ -7,31 +7,31 @@
 
 <a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update Word Data</a><br/><br/>
 
-Discovery Source: {{vocabentry.discovery_source|linebreaks}}<br/><br/>
-Discovery Context: {{vocabentry.discovery_context|linebreaks}}<br/><br/>
+<strong>Discovery Source:</strong> {{vocabentry.discovery_source|linebreaks}}<br/><br/>
+<strong>Discovery Context:</strong> {{vocabentry.discovery_context|linebreaks}}<br/><br/>
 
 {% if vocabentry.definition_override == None or vocabentry.definition_override == ""%}
-  Definition: {{vocabentry.word.definition|linebreaks}}<br/><br/>
+  <strong>Definition:</strong> {{vocabentry.word.definition|linebreaks}}<br/><br/>
 {% else %}
-  Definition: {{vocabentry.definition_override|linebreaks}}<br/><br/>
+  <strong>Definition:</strong> {{vocabentry.definition_override|linebreaks}}<br/><br/>
 {% endif %}
 
 {% if vocabentry.synonyms_override == None  or vocabentry.synonyms_override == ""%}
-  Synonyms: {{vocabentry.word.synonyms|linebreaks}} <br/><br/>
+    <strong>Synonyms:</strong> {{vocabentry.word.synonyms|linebreaks}} <br/><br/>
 {% else %}
-Synonyms: {{vocabentry.synonyms_override|linebreaks}}<br/><br/>
+<strong>Synonyms:</strong> {{vocabentry.synonyms_override|linebreaks}}<br/><br/>
 {% endif %}
 
 {% if vocabentry.examples_override == None or vocabentry.examples_override == ""%}
-  Examples: {{vocabentry.word.examples|linebreaks}} <br/><br/>
+  <strong>Examples:</strong> {{vocabentry.word.examples|linebreaks}} <br/><br/>
 {% else %}
-  Examples: {{vocabentry.examples_override|linebreaks}}<br/><br/>
+  <strong>Examples:</strong> {{vocabentry.examples_override|linebreaks}}<br/><br/>
 {% endif %}
 
 {% if vocabentry.etymology_override == None or vocabentry.etymology_override == ""%}
-  Etymology: {{vocabentry.word.etymology|linebreaks}} <br/><br/>
+  <strong>Etymology:</strong> {{vocabentry.word.etymology|linebreaks}} <br/><br/>
 {% else %}
-  Etymology: {{vocabentry.etymology_override|linebreaks}}<br/><br/>
+  <strong>Etymology:</strong> {{vocabentry.etymology_override|linebreaks}}<br/><br/>
 {% endif %}
 </div>
 {% endblock %}
