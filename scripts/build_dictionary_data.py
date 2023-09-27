@@ -5,6 +5,84 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+def run(word):
+    # Good examples for testing: monitor, feline, abaca, abeyance, absence, baloney, sown, forbode 
+    """
+    1. Call to Webster API, retrieve lemma ('id')
+    - If not found, try WordsAPI (see below)
+    2. In Webster API response, for each main entry:
+    - webster_etymology_str. Look for 'et' -- stop after finding one.
+    - Generate webster_definition_str: look for 'def'. Handle additional definition components (e.g. "ca", "sdsense" etc)
+    - Generate webster_synonyms_str: look for 'syn'
+    - Generate webster_examples_str: look for 'vis' within 'def' and look for 'quotes'
+    - Prefix each entry with a number so that synonyms and examples visually correspond to particular a definition
+    3. If Webster didn't find any synonyms or examples, try WordsAPI. For each WordsAPI "result":
+    - if len(results) > 1 and retrieving Webster lemma failed, include number prefix in definition_str, synonyms_str, examples_str
+    - Generate wordsapi_definition_str
+    - Generate wordsapi_synonyms_str
+    - Generate wordsapi_examples_str
+    4. Finalize synonyms_str, examples_str
+    - Use Webster for each if available, otherwise use WordsAPI (with result numbers removed since they wouldn't correspond to Webster entry numbers)
+    """
+
+    lemma, webster_top_level_list = get_webster_data(word)
+    if not lemma:# word not found at Webster
+        print("Word not found at Webster")
+        wordsapi_data = get_wordsapi_data(word)# check word (whatever they submitted) instead of lemma, since didn't get lemma from webster
+        if wordsapi_data.get("message") == "word not found" or not wordsapi_data.get("results"):# word not found at WordsAPI
+            print ("Word not found at WordsAPI")
+            dictionary_data = (word, "", "", "", "")
+        else:
+            wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str = extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums=False, exclude_example_result_nums=False)
+            dictionary_data = (word, wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str, "")
+
+    else:# found word at webster  
+        webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology = extract_webster_data(webster_top_level_list)
+        print(f"webster_definition_str: {webster_definition_str}")
+        print(f"webster_synonyms_str: {webster_synonyms_str}")
+        print(f"webster_examples_str: {webster_examples_str}")
+        print(f"webster_etymology: {webster_etymology}")
+
+        exclude_synonym_result_nums = False
+        exclude_example_result_nums = False
+        if webster_synonyms_str == "":
+            exclude_synonym_result_nums = True
+        if webster_examples_str == "":
+            exclude_example_result_nums = True
+        
+        if exclude_synonym_result_nums or exclude_example_result_nums:
+            wordsapi_data = get_wordsapi_data(lemma)
+            
+            if wordsapi_data.get("message") == "word not found" or not wordsapi_data.get("results"):# word not found at WordsAPI
+                dictionary_data = (lemma, webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology)
+            else:
+                wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str = extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums, exclude_example_result_nums)
+                print(f"wordsapi_definition_str: {wordsapi_definition_str}")
+                print(f"wordsapi_synonyms_str: {wordsapi_synonyms_str}")
+                print(f"wordsapi_examples_str: {wordsapi_examples_str}")
+
+                if exclude_synonym_result_nums:
+                    synonyms_str = wordsapi_synonyms_str
+                else:
+                    synonyms_str = webster_synonyms_str
+
+                if exclude_example_result_nums:
+                    examples_str = wordsapi_examples_str
+                else:
+                    examples_str = webster_examples_str
+
+                dictionary_data = (lemma, webster_definition_str, synonyms_str, examples_str, webster_etymology)
+
+        else:
+            dictionary_data = (lemma, webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology)
+
+    print("Lemma: " + dictionary_data[0])
+    print("Final definition: " + dictionary_data[1])
+    print("Final synonyms: " + dictionary_data[2])
+    print("Final examples: " + dictionary_data[3])
+    print("Final etymology: " + dictionary_data[4])
+    return dictionary_data
+
 def get_webster_data(word):
     MERRIAM_WEBSTER_DICTIONARY_KEY = os.getenv("MERRIAM_WEBSTER_DICTIONARY_KEY")
     url = f"https://www.dictionaryapi.com/api/v3/references/collegiate/json/{word}?key={MERRIAM_WEBSTER_DICTIONARY_KEY}"
@@ -450,84 +528,6 @@ def clean_webster_text(raw_str):
         cleaned_str = cleaned_str[1:-1]
 
     return cleaned_str
-
-def run(word):
-    # Good examples for testing: monitor, feline, abaca, abeyance, absence, baloney, sown, forbode 
-    """
-    1. Call to Webster API, retrieve lemma ('id')
-    - If not found, try WordsAPI (see below)
-    2. In Webster API response, for each main entry:
-    - webster_etymology_str. Look for 'et' -- stop after finding one.
-    - Generate webster_definition_str: look for 'def'. Handle additional definition components (e.g. "ca", "sdsense" etc)
-    - Generate webster_synonyms_str: look for 'syn'
-    - Generate webster_examples_str: look for 'vis' within 'def' and look for 'quotes'
-    - Prefix each entry with a number so that synonyms and examples visually correspond to particular a definition
-    3. If Webster didn't find any synonyms or examples, try WordsAPI. For each WordsAPI "result":
-    - if len(results) > 1 and retrieving Webster lemma failed, include number prefix in definition_str, synonyms_str, examples_str
-    - Generate wordsapi_definition_str
-    - Generate wordsapi_synonyms_str
-    - Generate wordsapi_examples_str
-    4. Finalize synonyms_str, examples_str
-    - Use Webster for each if available, otherwise use WordsAPI (with result numbers removed since they wouldn't correspond to Webster entry numbers)
-    """
-
-    lemma, webster_top_level_list = get_webster_data(word)
-    if not lemma:# word not found at Webster
-        print("Word not found at Webster")
-        wordsapi_data = get_wordsapi_data(word)# check word (whatever they submitted) instead of lemma, since didn't get lemma from webster
-        if wordsapi_data.get("message") == "word not found" or not wordsapi_data.get("results"):# word not found at WordsAPI
-            print ("Word not found at WordsAPI")
-            dictionary_data = (word, "", "", "", "")
-        else:
-            wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str = extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums=False, exclude_example_result_nums=False)
-            dictionary_data = (word, wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str, "")
-
-    else:# found word at webster  
-        webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology = extract_webster_data(webster_top_level_list)
-        print(f"webster_definition_str: {webster_definition_str}")
-        print(f"webster_synonyms_str: {webster_synonyms_str}")
-        print(f"webster_examples_str: {webster_examples_str}")
-        print(f"webster_etymology: {webster_etymology}")
-
-        exclude_synonym_result_nums = False
-        exclude_example_result_nums = False
-        if webster_synonyms_str == "":
-            exclude_synonym_result_nums = True
-        if webster_examples_str == "":
-            exclude_example_result_nums = True
-        
-        if exclude_synonym_result_nums or exclude_example_result_nums:
-            wordsapi_data = get_wordsapi_data(lemma)
-            
-            if wordsapi_data.get("message") == "word not found" or not wordsapi_data.get("results"):# word not found at WordsAPI
-                dictionary_data = (lemma, webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology)
-            else:
-                wordsapi_definition_str, wordsapi_synonyms_str, wordsapi_examples_str = extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums, exclude_example_result_nums)
-                print(f"wordsapi_definition_str: {wordsapi_definition_str}")
-                print(f"wordsapi_synonyms_str: {wordsapi_synonyms_str}")
-                print(f"wordsapi_examples_str: {wordsapi_examples_str}")
-
-                if exclude_synonym_result_nums:
-                    synonyms_str = wordsapi_synonyms_str
-                else:
-                    synonyms_str = webster_synonyms_str
-
-                if exclude_example_result_nums:
-                    examples_str = wordsapi_examples_str
-                else:
-                    examples_str = webster_examples_str
-
-                dictionary_data = (lemma, webster_definition_str, synonyms_str, examples_str, webster_etymology)
-
-        else:
-            dictionary_data = (lemma, webster_definition_str, webster_synonyms_str, webster_examples_str, webster_etymology)
-
-    print("Lemma: " + dictionary_data[0])
-    print("Final definition: " + dictionary_data[1])
-    print("Final synonyms: " + dictionary_data[2])
-    print("Final examples: " + dictionary_data[3])
-    print("Final etymology: " + dictionary_data[4])
-    return dictionary_data
 
 # Oxford English Dictionary (no longer available free):
 # def get_lemma_for_word(word):
