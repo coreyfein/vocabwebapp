@@ -1,7 +1,7 @@
 #from simplevocab.models import Word, VocabEntry
+import misc_helpers
 import json
 import requests
-import re
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -181,17 +181,9 @@ def extract_wordsapi_data(wordsapi_data, exclude_synonym_result_nums, exclude_ex
         if len(examples_list) > 0:
             examples_str += example_str_suffix
 
-    definition_str = definition_str.strip()
-    if definition_str.endswith(";"):
-        definition_str = definition_str[:-1]
-
-    synonyms_str = synonyms_str.strip()
-    if synonyms_str.endswith(";"):
-        synonyms_str = synonyms_str[:-1]
-
-    examples_str = examples_str.strip()
-    if examples_str.endswith(";"):
-        examples_str = examples_str[:-1]
+    definition_str = misc_helpers.strip_whitespace_and_more(definition_str, non_whitespace_chars_to_strip=",;:-|")
+    synonyms_str = misc_helpers.strip_whitespace_and_more(synonyms_str, non_whitespace_chars_to_strip=",;:-|")
+    examples_str = misc_helpers.strip_whitespace_and_more(examples_str, non_whitespace_chars_to_strip=",;:-|")
 
     return definition_str, synonyms_str, examples_str
 
@@ -215,6 +207,7 @@ def extract_webster_data(webster_top_level_list):
         
         # Below, if the "id" for this entry is different than the main "id". e.g. "sow" has an entry with "id" == "self-sow" and "baloney" has an entry with "id" == "bologna". 
         # It's impossible to decide whether to skip or not (would want to skip "self-sow" but not "bologna", e.g.), so just put the different "id" in brackets at the beginning of the definition
+        # Other examples include: monitor, feline
         entry_id = entry["meta"]["id"].split(":")[0]
         different_id_from_first_entry_prefix = ""
         if entry_id != webster_top_level_list[0]["meta"]["id"].split(":")[0]:
@@ -256,7 +249,7 @@ def extract_webster_data(webster_top_level_list):
                     parenthesized_sequence = sub_sense[1]
                     for sub_pseq_count, sub_pseq in enumerate(parenthesized_sequence): 
                         sub_pseq_num = sub_pseq_count + 1
-                        if sub_pseq[0] == "bs":# ends in such as, examples follow
+                        if sub_pseq[0] == "bs":# ends in such as, example senses follow. examples include: monitor, 
                             sense_dict = sub_pseq[1]["sense"]
                             sense_definition_text_list = sense_dict["dt"]
                             for component in sense_definition_text_list:
@@ -283,7 +276,7 @@ def extract_webster_data(webster_top_level_list):
                                     definitions_this_pseq_str = definitions_this_pseq_str.replace("  ", " ")
                                     if sub_pseq_num == len(parenthesized_sequence) and sense_num != total_senses_in_definition_sense_sequence:# last in a pseq but not last in definition_sense_sequence
                                         definitions_this_pseq_str += "; "
-                                if component[0] == "ca":
+                                if component[0] == "ca":# haven't found examples of a "ca" within a "sense" within a "pseq" but it should work just like within a "sense" not within a "pseq"
                                     called_also_text_dicts_list = component[1]["cats"]
                                     called_also_text_list = []
                                     for called_also_text_dict in called_also_text_dicts_list:
@@ -294,7 +287,7 @@ def extract_webster_data(webster_top_level_list):
                                         definitions_this_pseq_str = definitions_this_pseq_str[:-2] + f", also called {called_also_text_str}; "
                                     else:
                                         definitions_this_pseq_str = definitions_this_pseq_str + f", also called {called_also_text_str}"
-                                if component[0] == "uns":
+                                if component[0] == "uns":# haven't found examples of an "uns" within a "sense" within a "pseq" but it should work just like within a "sense" not within a "pseq"
                                     for uns_component in component[1][0]:
                                         if uns_component[0] == "text":
                                             usage_note = clean_webster_text(uns_component[1])
@@ -339,7 +332,7 @@ def extract_webster_data(webster_top_level_list):
 
                 # Below: "bs" not within a "pseq" MAY be followed by at least one "sense" for which the value of "sn" (letter not yet in parentheses) should be included before the text; 
                 # OR it may just have a "sdsense" within the sense_dict alongside "dt" which should be appended to the "dt" text, just like if it were within a "pseq"
-                elif sub_sense[0] == "bs":
+                elif sub_sense[0] == "bs":# examples include: feline
                     bs_this_entry = True
                     definitions_this_bs_str = ""
                     sense_dict = sub_sense[1]["sense"]
@@ -383,11 +376,11 @@ def extract_webster_data(webster_top_level_list):
                                 bsseq_num_str = sense_dict.get("sn", "")
                                 bsseq_num_str = f" ({bsseq_num_str}) "
                                 definitions_this_sense_str += bsseq_num_str + clean_webster_text(component[1])
-                            else:
+                            else:# examples include: monitor
                                 definitions_this_sense_str += clean_webster_text(component[1])
                                 if not sense_dict.get("sdsense"):
                                     definitions_this_sense_str += "; "
-                        if component[0] == "ca":
+                        if component[0] == "ca":# examples include: abaca
                             called_also_text_dicts_list = component[1]["cats"]
                             called_also_text_list = []
                             for called_also_text_dict in called_also_text_dicts_list:
@@ -398,7 +391,7 @@ def extract_webster_data(webster_top_level_list):
                                 definitions_this_sense_str = definitions_this_sense_str[:-2] + f", also called {called_also_text_str}; "
                             else:
                                 definitions_this_sense_str = definitions_this_sense_str + f", also called {called_also_text_str}"
-                        if component[0] == "uns":
+                        if component[0] == "uns":# examples include: abeyance
                             for uns_component in component[1][0]:
                                 if uns_component[0] == "text":
                                     usage_note = clean_webster_text(uns_component[1])
@@ -407,7 +400,7 @@ def extract_webster_data(webster_top_level_list):
                                 definitions_this_sense_str = definitions_this_sense_str[:-2] + f" ({usage_note}); "
                             else:
                                 definitions_this_sense_str = definitions_this_sense_str + f" ({usage_note})"
-                        if component[0] == "vis":
+                        if component[0] == "vis":# examples include: monitor
                             for example_dict in component[1]:
                                 author = ""
                                 author_dict = example_dict.get("aq", {})
@@ -453,17 +446,11 @@ def extract_webster_data(webster_top_level_list):
         else:
             entry_str_suffix = ""    
         
-        definitions_this_entry_str = definitions_this_entry_str.strip()
-        if definitions_this_entry_str.endswith(";"):# easier to remove at this point than to figure out which sense is the last one
-            definitions_this_entry_str = definitions_this_entry_str[:-1]
-
+        definitions_this_entry_str = misc_helpers.strip_whitespace_and_more(definitions_this_entry_str, non_whitespace_chars_to_strip=",;:-|")
         definition_str += entry_num_prefix + part_of_speech_prefix  + different_id_from_first_entry_prefix + definitions_this_entry_str + entry_str_suffix
 
         if synonyms_this_entry_str != "":
-
-            synonyms_this_entry_str = synonyms_this_entry_str.strip()
-            if synonyms_this_entry_str.endswith(";"):# easier to remove at this point than to figure out which sense is the last one
-                synonyms_this_entry_str = synonyms_this_entry_str[:-1]
+            synonyms_this_entry_str = misc_helpers.strip_whitespace_and_more(synonyms_this_entry_str, non_whitespace_chars_to_strip=",;:-|")
             synonyms_str += entry_num_prefix + different_id_from_first_entry_prefix + synonyms_this_entry_str + entry_str_suffix
 
         if examples_this_entry != []:
@@ -478,8 +465,9 @@ def extract_webster_data(webster_top_level_list):
     return clean_webster_text(definition_str), clean_webster_text(synonyms_str), clean_webster_text(examples_str), clean_webster_text(etymology)
 
 def clean_webster_text(raw_str):
-    cleaned_str = raw_str.strip()
+    cleaned_str = raw_str
     tokens_to_remove_but_keep_text_between_tokens = ["{b}", "{/b}", "{bc}", "{inf}", "{/inf}", "{it}", "{/it}", "{ldquo}", "{rdquo}", "{sc}", "{/sc}", "{sup}", "{wi}", "{/wi}", "{parahw}", "{/parahw}", "{phrase}", "{/phrase}", "{qword}", "{/qword}", "{mat}"]
+    # examples include: absence
     # ^removing {mat} above, which only exists within {ma} tokens. Then remove text within {ma} tokens which would've otherwise included the {mat} tokens
     for token in tokens_to_remove_but_keep_text_between_tokens:
         cleaned_str = cleaned_str.replace(token, "")
@@ -490,7 +478,7 @@ def clean_webster_text(raw_str):
         cleaned_str = cleaned_str.replace(token_start, "(")
         cleaned_str = cleaned_str.replace(token_end, ")")
     
-    tokens_to_remove_and_remove_text_between_tokens = ["{gloss}", "{ma}"]
+    tokens_to_remove_and_remove_text_between_tokens = ["{gloss}", "{ma}"]# examples include: absence
     for token_start in tokens_to_remove_and_remove_text_between_tokens:
         token_end = token_start.replace("{", "{/")
         while token_start in cleaned_str:
@@ -520,11 +508,10 @@ def clean_webster_text(raw_str):
             cleaned_str = cleaned_str[:next_token_index - 1] + token_str_to_keep + cleaned_str[next_closing_curly_brace_index + 1:]
 
     # ignore {ds} token since that's only within "date" (as in date first seen, which isn't used at all)
-    for bad_start_end_str in [" ", ",", ";", ":", "-", "|"]:
-        cleaned_str = cleaned_str.strip(bad_start_end_str)
     cleaned_str = cleaned_str.replace(", ,", ",")
     cleaned_str = cleaned_str.replace("; ;", ";")
     cleaned_str = cleaned_str.replace(" ;", ";")
+    cleaned_str = misc_helpers.strip_whitespace_and_more(cleaned_str, non_whitespace_chars_to_strip=",;:-|")
 
     #after fully cleaning, check if it starts and ends with parentheses (and only has one set), and remove them if so. this is mostly for definitions that are just sx| tokens:
     if cleaned_str.count("(") == 1 and cleaned_str.count(")") == 1 and cleaned_str[0] == "(" and cleaned_str[-1] == ")":
@@ -707,4 +694,4 @@ if __name__ == "__main__":
     # UNCOMMENT THIS LINE run()
     word = input("Enter word > ")
     build_dictionary_data(word)
-    # monitor, feline, abaca, abeyance, absence, baloney, sown, forbode
+    # monitor, feline, abaca, abeyance, absence, baloney, sown, forbode (add comments to specific sections where these words are good examples)
