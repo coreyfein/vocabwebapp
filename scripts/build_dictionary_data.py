@@ -1,4 +1,4 @@
-import misc_helpers
+from scripts import misc_helpers
 import json
 import requests
 import os

@@ -1,9 +1,11 @@
 from simplevocab.models import Word, VocabEntry
-import build_dictionary_data
+from scripts import build_dictionary_data
 
 def run(word_input, discovery_source_input, discovery_context_input, user, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):    
     # lemma = get_lemma_for_word(word_input) #OED version only
     # w, created = Word.objects.get_or_create(word__iexact=lemma) #OED version only
+    discovery_source_input = discovery_source_input.strip()
+    discovery_context_input = discovery_context_input.strip()
     w, created = Word.objects.get_or_create(word__iexact=word_input)
     print(f"word id: {str(w.id)}")
     print(f"Created: {created}")
