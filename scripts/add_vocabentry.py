@@ -30,7 +30,7 @@ def run(word_input, discovery_source_input, discovery_context_input, user, defin
     
     print(f"vocab_entry_already_existed_for_word: {vocab_entry_already_existed_for_word}")
     print(f"word_found_in_dictionary: {word_found_in_dictionary}")
-    return word_found_in_dictionary, vocab_entry_already_existed_for_word
+    return v.id, word_found_in_dictionary, vocab_entry_already_existed_for_word
 
 def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input, user, word_freshly_created, definition_override=None, synonyms_override=None, examples_override=None, etymology_override=None):
     if word_freshly_created:
@@ -65,7 +65,7 @@ def get_or_create_vocabentry(w, discovery_source_input, discovery_context_input,
         return v, vocab_entry_already_existed_for_word
     
     else:
-        return None, vocab_entry_already_existed_for_word
+        return v, vocab_entry_already_existed_for_word
     
 if __name__ == "__main__":
     run()    

@@ -48,6 +48,9 @@ class VocabEntryDeleteView(OwnerDeleteView):
 class VocabEntryCreateView(LoginRequiredMixin, FormView):
     template_name = "simplevocab/vocabentry_user_input.html"
     form_class = VocabEntryUserInputForm
+    def __init__(self):
+        self.vocabentry_id = None
+        self.word_found_in_dictionary = None
     def get_initial(self):
         initial = super().get_initial()
         initial["word"] = self.request.GET.get("word")
@@ -61,9 +64,18 @@ class VocabEntryCreateView(LoginRequiredMixin, FormView):
         discovery_source = form.cleaned_data["discovery_source"]
         discovery_context = form.cleaned_data["discovery_context"]
         user = self.request.user
-        word_found_in_dictionary, vocab_entry_already_existed_for_word = add_vocabentry.run(word, discovery_source, discovery_context, user)
-        #  add functionality to raise an error here (if success == False)
+        vocabentry_id, word_found_in_dictionary, vocab_entry_already_existed_for_word = add_vocabentry.run(word, discovery_source, discovery_context, user)
+        self.vocab_entry_id = int(vocabentry_id)
+        self.word_found_in_dictionary = word_found_in_dictionary
+        print(f"vocab_entry_id: {vocabentry_id}")
         return super().form_valid(form)
+    def get_success_url(self):
+        if self.word_found_in_dictionary:
+            return reverse_lazy('simplevocab:vocabentry_detail', kwargs={'pk': self.vocab_entry_id})
+        else:
+            # for now, we create the word and vocabentry and don't have a message/page to notify the user that no definition was found so it will route the same way. 
+            # eventually, should route to a page explaining that no definition was found
+            return reverse_lazy('simplevocab:vocabentry_detail', kwargs={'pk': self.vocab_entry_id})
     
 class VocabListUploadView(LoginRequiredMixin, FormView):
     template_name = "simplevocab/vocab_list_upload.html"

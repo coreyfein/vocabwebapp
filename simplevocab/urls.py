@@ -11,7 +11,7 @@ urlpatterns = [
     path('vocabentry/<int:pk>/delete',
         views.VocabEntryDeleteView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocabentry_delete'),
     path('vocabentry/create',
-        views.VocabEntryCreateView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocabentry_create'),
+        views.VocabEntryCreateView.as_view(), name='vocabentry_create'),#success_url set in view to vocabentry_detail for the pk of newly created vocabentry
     path('upload',
         views.VocabListUploadView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocab_list_upload'),
     path('quiz',
