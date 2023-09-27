@@ -7,8 +7,8 @@
 
 <a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update Word Data</a><br/><br/>
 
-Discovery Source: {{vocabentry.discovery_source}}<br/><br/>
-Discovery Context: {{vocabentry.discovery_context}}<br/><br/>
+Discovery Source: {{vocabentry.discovery_source|linebreaks}}<br/><br/>
+Discovery Context: {{vocabentry.discovery_context|linebreaks}}<br/><br/>
 
 {% if vocabentry.definition_override == None or vocabentry.definition_override == ""%}
   Definition: {{vocabentry.word.definition|linebreaks}}<br/><br/>
