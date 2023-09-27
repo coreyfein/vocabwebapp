@@ -16,9 +16,9 @@ Any field left blank will use our default word data, shown below the form. You c
 </form>
 <br/>
 <h4>Default Word Data:</h4>
-Definition: {{object.word.definition}} <br/><br/>
-Synonyms: {{object.word.synonyms}} <br/><br/>
-Examples: {{object.word.examples}} <br/><br/>
-Etymology: {{object.word.etymology}}<br/><br/>
+Definition: {{object.word.definition|linebreaks}} <br/><br/>
+Synonyms: {{object.word.synonyms|linebreaks}} <br/><br/>
+Examples: {{object.word.examples|linebreaks}} <br/><br/>
+Etymology: {{object.word.etymology|linebreaks}}<br/><br/>
 </div>
 {% endblock %}

@@ -11,27 +11,27 @@ Discovery Source: {{vocabentry.discovery_source}}<br/><br/>
 Discovery Context: {{vocabentry.discovery_context}}<br/><br/>
 
 {% if vocabentry.definition_override == None or vocabentry.definition_override == ""%}
-  Definition: {{vocabentry.word.definition}}<br/><br/>
+  Definition: {{vocabentry.word.definition|linebreaks}}<br/><br/>
 {% else %}
-  Definition: {{vocabentry.definition_override}}<br/><br/>
+  Definition: {{vocabentry.definition_override|linebreaks}}<br/><br/>
 {% endif %}
 
 {% if vocabentry.synonyms_override == None  or vocabentry.synonyms_override == ""%}
-  Synonyms: {{vocabentry.word.synonyms}} <br/><br/>
+  Synonyms: {{vocabentry.word.synonyms|linebreaks}} <br/><br/>
 {% else %}
-Synonyms: {{vocabentry.synonyms_override}}<br/><br/>
+Synonyms: {{vocabentry.synonyms_override|linebreaks}}<br/><br/>
 {% endif %}
 
 {% if vocabentry.examples_override == None or vocabentry.examples_override == ""%}
-  Examples: {{vocabentry.word.examples}} <br/><br/>
+  Examples: {{vocabentry.word.examples|linebreaks}} <br/><br/>
 {% else %}
-  Examples: {{vocabentry.examples_override}}<br/><br/>
+  Examples: {{vocabentry.examples_override|linebreaks}}<br/><br/>
 {% endif %}
 
 {% if vocabentry.etymology_override == None or vocabentry.etymology_override == ""%}
-  Etymology: {{vocabentry.word.etymology}} <br/><br/>
+  Etymology: {{vocabentry.word.etymology|linebreaks}} <br/><br/>
 {% else %}
-  Etymology: {{vocabentry.etymology_override}}<br/><br/>
+  Etymology: {{vocabentry.etymology_override|linebreaks}}<br/><br/>
 {% endif %}
 </div>
 {% endblock %}

@@ -12,12 +12,12 @@
             {% if vocab_entry_dict.field_name == field.name %}
             <h4>{{vocab_entry_dict.vocab_entry.word}}</h4>
             <div id="{{vocab_entry_dict.vocab_entry.word}}" style="display: none">
-                <p>Definition: {{vocab_entry_dict.definition}}</br>
-                Synonyms: {{vocab_entry_dict.synonyms}}</br>
-                Examples: {{vocab_entry_dict.examples}}</br>
-                Etymology: {{vocab_entry_dict.etymology}}</br>
-                Discovery Source: {{vocab_entry_dict.discovery_source}}</br>
-                Discovery Context: {{vocab_entry_dict.discovery_context}}</p>
+                <p>Definition: {{vocab_entry_dict.definition|linebreaks}}</br>
+                Synonyms: {{vocab_entry_dict.synonyms|linebreaks}}</br>
+                Examples: {{vocab_entry_dict.examples|linebreaks}}</br>
+                Etymology: {{vocab_entry_dict.etymology|linebreaks}}</br>
+                Discovery Source: {{vocab_entry_dict.discovery_source|linebreaks}}</br>
+                Discovery Context: {{vocab_entry_dict.discovery_context|linebreaks}}</p>
             </div>
             <script type="text/javascript" 
                     src="{% static 'simplevocab/display_word_data.js' %}">
