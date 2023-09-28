@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def run(word):
-    # Good examples for testing: monitor, feline, abaca, abeyance, absence, baloney, sown, forbode 
+    # Good examples for testing: monitor, feline, abaca, abeyance, absence, baloney, sown, forbode, chary
     """
     1. Call to Webster API, retrieve lemma ('id')
     - If not found, try WordsAPI (see below)
@@ -252,8 +252,8 @@ def extract_webster_data(webster_top_level_list):
                 total_senses_in_definition_sense_sequence += 1
         for sense_count, sense in enumerate(definition_sense_sequence):
             sense_num = sense_count + 1
-            bs_this_entry = False
             for sub_sense in sense:
+                bs_this_subsense = False
                 if sub_sense[0] == "pseq":# "pseq" includes optional "bs" followed by at least one "sense" for which the value of "sn" (pseq number in parentheses) should be included before the text
                     definitions_this_pseq_str = ""
                     parenthesized_sequence = sub_sense[1]
@@ -343,7 +343,7 @@ def extract_webster_data(webster_top_level_list):
                 # Below: "bs" not within a "pseq" MAY be followed by at least one "sense" for which the value of "sn" (letter not yet in parentheses) should be included before the text; 
                 # OR it may just have a "sdsense" within the sense_dict alongside "dt" which should be appended to the "dt" text, just like if it were within a "pseq"
                 elif sub_sense[0] == "bs":# examples include: feline
-                    bs_this_entry = True
+                    bs_this_subsense = True
                     definitions_this_bs_str = ""
                     sense_dict = sub_sense[1]["sense"]
                     sense_definition_text_list = sense_dict["dt"]
@@ -382,7 +382,7 @@ def extract_webster_data(webster_top_level_list):
                     sense_definition_text_list = sense_dict["dt"]
                     for component in sense_definition_text_list:
                         if component[0] == "text":
-                            if bs_this_entry:# if this sense follows a "bs"
+                            if bs_this_subsense:# if this sense follows a "bs" (examples include chary, which has some senses that follow a "bs" in the same subsense, and some that follow it in a separate subsense)
                                 bsseq_num_str = sense_dict.get("sn", "")
                                 bsseq_num_str = f" ({bsseq_num_str}) "
                                 definitions_this_sense_str += bsseq_num_str + clean_webster_text(component[1])
@@ -521,6 +521,7 @@ def clean_webster_text(raw_str):
     cleaned_str = cleaned_str.replace(", ,", ",")
     cleaned_str = cleaned_str.replace("; ;", ";")
     cleaned_str = cleaned_str.replace(" ;", ";")
+    cleaned_str = cleaned_str.replace(".;", ";")
     cleaned_str = misc_helpers.strip_whitespace_and_more(cleaned_str, non_whitespace_chars_to_strip=",;:-|")
 
     #after fully cleaning, check if it starts and ends with parentheses (and only has one set), and remove them if so. this is mostly for definitions that are just "sx|"" tokens:
@@ -620,3 +621,6 @@ def clean_webster_text(raw_str):
 
     # dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
     # return dictionary_data
+
+if __name__ == "__main__":
+    run("chary")
