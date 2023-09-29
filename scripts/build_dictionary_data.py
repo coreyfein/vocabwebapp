@@ -383,14 +383,8 @@ def extract_webster_data(webster_top_level_list):
                     definitions_this_entry_str += definitions_this_sense_str
 
         quotes = entry.get("quotes", [])
-        for quote_dict in quotes:
-            author = ""
-            author_dict = quote_dict.get("aq", {})
-            if author_dict != {}:
-                author = clean_webster_text(author_dict.get("auth", ""))
-                if author != "":
-                    author = f" ({author})"
-            examples_this_entry.append(clean_webster_text(quote_dict["t"]) + author)
+        examples_to_extend = get_example_str_from_example_dicts_list(quotes)
+        examples_this_entry.extend(examples_to_extend)
 
         syns = entry.get("syns")
         if syns:
@@ -440,13 +434,28 @@ def get_status_label_string_from_sense_dict(sense_dict):
 def get_example_str_from_example_dicts_list(example_dicts_list):
     examples_to_extend = []
     for example_dict in example_dicts_list:
-        author = ""
+        author_source_date = ""
+        print(f"author_source_date: {author_source_date}")
         author_dict = example_dict.get("aq")
+        print(author_dict)
         if author_dict:
-            author = clean_webster_text(author_dict.get("auth", ""))
-            if author != "":
-                author = f" ({author})"
-        example_str = clean_webster_text(example_dict["t"]) + author
+            author = clean_webster_text(author_dict.get("auth"))
+            source = clean_webster_text(author_dict.get("source"))
+            if author and source:
+                author_and_source = f"-{author}, {source}"
+            elif author and not source:
+                author_and_source = f"-{author}"
+            elif source:
+                author_and_source = f"-{source}"
+            else:
+                print(f"author_source_date: {author_source_date}")
+                continue
+            date = clean_webster_text(author_dict.get("aqdate"))
+            author_source_date = f" {author_and_source}"
+            
+            if date:
+                author_source_date += f" ({date})"
+        example_str = clean_webster_text(example_dict["t"]) + author_source_date
         examples_to_extend.append(example_str)
     
     return examples_to_extend
@@ -616,6 +625,3 @@ def clean_webster_text(raw_str):
 
     # dictionary_data = (word, definition_string, synonyms_string, examples_string, etymology)
     # return dictionary_data
-
-if __name__ == "__main__":
-    run("chary")
