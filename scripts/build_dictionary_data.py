@@ -250,10 +250,12 @@ def extract_webster_data(webster_top_level_list):
         for sense in definition_sense_sequence:
             for sub_sense in sense:
                 total_senses_in_definition_sense_sequence += 1
+        bs_this_sense = False
         for sense_count, sense in enumerate(definition_sense_sequence):
             sense_num = sense_count + 1
+            bs_this_subsense = False
             for sub_sense in sense:
-                bs_this_subsense = False
+                print(sub_sense)
                 if sub_sense[0] == "pseq":# "pseq" includes optional "bs" followed by at least one "sense" for which the value of "sn" (pseq number in parentheses) should be included before the text
                     definitions_this_pseq_str = ""
                     parenthesized_sequence = sub_sense[1]
@@ -262,62 +264,41 @@ def extract_webster_data(webster_top_level_list):
                         if sub_pseq[0] == "bs":# ends in such as, example senses follow. examples include: monitor, 
                             sense_dict = sub_pseq[1]["sense"]
                             sense_definition_text_list = sense_dict["dt"]
+                            status_labels_str = get_status_label_string_from_sense_dict(sense_dict)
                             for component in sense_definition_text_list:
                                 if component[0] == "text":
-                                    definitions_this_pseq_str += clean_webster_text(component[1])
+                                    definitions_this_pseq_str += status_labels_str + clean_webster_text(component[1])
                                     if sub_pseq_num != len(parenthesized_sequence):
                                         definitions_this_pseq_str += " "
                                 if component[0] == "vis":
-                                    author = ""
-                                    for example_dict in component[1]:
-                                        author_dict = example_dict.get("aq", {})
-                                        if author_dict != {}:
-                                            author = clean_webster_text(author_dict.get("auth", ""))
-                                            if author != "":
-                                                author = f" ({author})"
-                                        examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                                    examples_to_extend = get_example_str_from_example_dicts_list(component[1])
+                                    examples_this_entry.extend(examples_to_extend)
                         elif sub_pseq[0] == "sense":# examples following "bs"
                             sense_dict = sub_pseq[1]
                             sense_definition_text_list = sense_dict["dt"]
                             pseq_num_str = sense_dict["sn"]
+                            status_labels_str = get_status_label_string_from_sense_dict(sense_dict)
                             for component in sense_definition_text_list:
                                 if component[0] == "text":
-                                    definitions_this_pseq_str += " " + pseq_num_str + " " + clean_webster_text(component[1])
+                                    definitions_this_pseq_str += " " + pseq_num_str + " " + status_labels_str + clean_webster_text(component[1])
                                     definitions_this_pseq_str = definitions_this_pseq_str.replace("  ", " ")
                                     if sub_pseq_num == len(parenthesized_sequence) and sense_num != total_senses_in_definition_sense_sequence:# last in a pseq but not last in definition_sense_sequence
                                         definitions_this_pseq_str += "; "
                                 if component[0] == "ca":# haven't found examples of a "ca" within a "sense" within a "pseq" but it should work just like within a "sense" not within a "pseq"
-                                    called_also_text_dicts_list = component[1]["cats"]
-                                    called_also_text_list = []
-                                    for called_also_text_dict in called_also_text_dicts_list:
-                                        called_also_text_list.append(called_also_text_dict["cat"])
-                                    called_also_text_str = ", ".join(called_also_text_list)
-                                    called_also_text_str = clean_webster_text(called_also_text_str)
-                                    if definitions_this_pseq_str[-2:] == "; ":
-                                        definitions_this_pseq_str = definitions_this_pseq_str[:-2] + f", also called {called_also_text_str}; "
+                                    called_also_text_str = get_called_also_text_str_from_ca_dict(component[1])
+                                    if definitions_this_pseq_str.endswith("; "):
+                                        definitions_this_pseq_str = definitions_this_pseq_str[:-2] + called_also_text_str + "; "
                                     else:
-                                        definitions_this_pseq_str = definitions_this_pseq_str + f", also called {called_also_text_str}"
+                                        definitions_this_pseq_str = definitions_this_pseq_str + called_also_text_str
                                 if component[0] == "uns":# haven't found examples of an "uns" within a "sense" within a "pseq" but it should work just like within a "sense" not within a "pseq"
-                                    for uns_component in component[1][0]:
-                                        if uns_component[0] == "text":
-                                            usage_note = clean_webster_text(uns_component[1])
-                                            break
-                                    if definitions_this_pseq_str[-2:] == "; ":
+                                    usage_note = get_usage_note_from_uns_list(component[1])
+                                    if definitions_this_pseq_str.endswith("; "):
                                         definitions_this_pseq_str = definitions_this_pseq_str[:-2] + f" ({usage_note}); "
                                     else:
                                         definitions_this_pseq_str = definitions_this_pseq_str + f" ({usage_note})"
                                 if component[0] == "vis":
-                                    for example_dict in component[1]:
-                                        author = ""
-                                        author_dict = example_dict.get("aq", {})
-                                        if author_dict != {}:
-                                            author = clean_webster_text(author_dict.get("auth", ""))
-                                            if author != "":
-                                                author = f" ({author})"
-                                        author = clean_webster_text(example_dict.get("aq", ""))
-                                        if author != "":
-                                            author = f" ({author})"
-                                        examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                                    examples_to_extend = get_example_str_from_example_dicts_list(component[1])
+                                    examples_this_entry.extend(examples_to_extend)
                         
                         # Regardless of whether the sense is "bs" or "sense", account for adding "sdsense" to the definition text if it's present
                         if sense_dict.get("sdsense"):
@@ -329,36 +310,26 @@ def extract_webster_data(webster_top_level_list):
                                     if sub_pseq_num != len(parenthesized_sequence):
                                         definitions_this_pseq_str += "; "
                                 if component[0] == "vis":
-                                    for example_dict in component[1]:
-                                        author = ""
-                                        author_dict = example_dict.get("aq", {})
-                                        if author_dict != {}:
-                                            author = clean_webster_text(author_dict.get("auth", ""))
-                                            if author != "":
-                                                author = f" ({author})"
-                                        examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                                    examples_to_extend = get_example_str_from_example_dicts_list(component[1])
+                                    examples_this_entry.extend(examples_to_extend)
 
                     definitions_this_entry_str += f"{definitions_this_pseq_str}"
 
                 # Below: "bs" not within a "pseq" MAY be followed by at least one "sense" for which the value of "sn" (letter not yet in parentheses) should be included before the text; 
                 # OR it may just have a "sdsense" within the sense_dict alongside "dt" which should be appended to the "dt" text, just like if it were within a "pseq"
-                elif sub_sense[0] == "bs":# examples include: feline
+                elif sub_sense[0] == "bs":# examples include: feline, chary
+                    bs_this_sense = True
                     bs_this_subsense = True
                     definitions_this_bs_str = ""
                     sense_dict = sub_sense[1]["sense"]
                     sense_definition_text_list = sense_dict["dt"]
+                    status_labels_str = get_status_label_string_from_sense_dict(sense_dict)
                     for component in sense_definition_text_list:
                         if component[0] == "text":
-                            definitions_this_bs_str += clean_webster_text(component[1])
+                            definitions_this_bs_str += status_labels_str + clean_webster_text(component[1])
                         if component[0] == "vis":
-                            author = ""
-                            author_dict = example_dict.get("aq", {})
-                            if author_dict != {}:
-                                author = clean_webster_text(author_dict.get("auth", ""))
-                                if author != "":
-                                    author = f" ({author})"
-                            for example_dict in component[1]:
-                                examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                            examples_to_extend = get_example_str_from_example_dicts_list(component[1])
+                            examples_this_entry.extend(examples_to_extend)
                     if sense_dict.get("sdsense"):
                         sense_divider = sense_dict["sdsense"]["sd"]# something like "specifically"
                         for component in sense_dict["sdsense"]["dt"]:
@@ -366,59 +337,43 @@ def extract_webster_data(webster_top_level_list):
                                 sd_text = clean_webster_text(component[1])
                                 definitions_this_bs_str += f", {sense_divider} {sd_text}"
                             if component[0] == "vis":
-                                for example_dict in component[1]:
-                                    author = ""
-                                    author_dict = example_dict.get("aq", {})
-                                    if author_dict != {}:
-                                        author = clean_webster_text(author_dict.get("auth", ""))
-                                        if author != "":
-                                            author = f" ({author})"
-                                    examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                                examples_to_extend = get_example_str_from_example_dicts_list(component[1])
+                                examples_this_entry.extend(examples_to_extend)
                     definitions_this_entry_str += definitions_this_bs_str
 
                 elif sub_sense[0] == "sense":
                     definitions_this_sense_str = ""
                     sense_dict = sub_sense[1]
                     sense_definition_text_list = sense_dict["dt"]
+                    status_labels_str = get_status_label_string_from_sense_dict(sense_dict)
                     for component in sense_definition_text_list:
                         if component[0] == "text":
-                            if bs_this_subsense:# if this sense follows a "bs" (examples include chary, which has some senses that follow a "bs" in the same subsense, and some that follow it in a separate subsense)
+                            if bs_this_sense:# if this subsense follows a "bs" within the same sense. examples include feline, chary. chary has some subsenses that follow a "bs" in the same sense, and also some that follow it in a separate sense)
                                 bsseq_num_str = sense_dict.get("sn", "")
                                 bsseq_num_str = f" ({bsseq_num_str}) "
-                                definitions_this_sense_str += bsseq_num_str + clean_webster_text(component[1])
+                                if not bs_this_subsense:# if a previous subsense followed a "bs", but now this one is not part of the "bs" sequence. examples include: chary
+                                    definitions_this_sense_str += "; " + status_labels_str + clean_webster_text(component[1])
+                                else:
+                                    definitions_this_sense_str += bsseq_num_str + status_labels_str + clean_webster_text(component[1])
                             else:# examples include: monitor
-                                definitions_this_sense_str += clean_webster_text(component[1])
+                                definitions_this_sense_str += status_labels_str + clean_webster_text(component[1])
                                 if not sense_dict.get("sdsense"):
                                     definitions_this_sense_str += "; "
                         if component[0] == "ca":# examples include: abaca
-                            called_also_text_dicts_list = component[1]["cats"]
-                            called_also_text_list = []
-                            for called_also_text_dict in called_also_text_dicts_list:
-                                called_also_text_list.append(called_also_text_dict["cat"])
-                            called_also_text_str = ", ".join(called_also_text_list)
-                            called_also_text_str = clean_webster_text(called_also_text_str)
-                            if definitions_this_sense_str[-2:] == "; ":
-                                definitions_this_sense_str = definitions_this_sense_str[:-2] + f", also called {called_also_text_str}; "
+                            called_also_text_str = get_called_also_text_str_from_ca_dict(component[1])
+                            if definitions_this_sense_str.endswith("; "):
+                                definitions_this_sense_str = definitions_this_sense_str[:-2] + called_also_text_str + "; "
                             else:
-                                definitions_this_sense_str = definitions_this_sense_str + f", also called {called_also_text_str}"
+                                definitions_this_sense_str = definitions_this_sense_str + called_also_text_str
                         if component[0] == "uns":# examples include: abeyance
-                            for uns_component in component[1][0]:
-                                if uns_component[0] == "text":
-                                    usage_note = clean_webster_text(uns_component[1])
-                                    break
-                            if definitions_this_sense_str[-2:] == "; ":
+                            usage_note = get_usage_note_from_uns_list(component[1])
+                            if definitions_this_sense_str.endswith("; "):
                                 definitions_this_sense_str = definitions_this_sense_str[:-2] + f" ({usage_note}); "
                             else:
                                 definitions_this_sense_str = definitions_this_sense_str + f" ({usage_note})"
                         if component[0] == "vis":# examples include: monitor
-                            for example_dict in component[1]:
-                                author = ""
-                                author_dict = example_dict.get("aq", {})
-                                if author_dict != {}:
-                                    author = clean_webster_text(author_dict.get("auth", ""))
-                                    if author != "":
-                                        author = f" ({author})"
-                                examples_this_entry.append(clean_webster_text(example_dict["t"]) + author)
+                            examples_to_extend = get_example_str_from_example_dicts_list(component[1])
+                            examples_this_entry.extend(examples_to_extend)
                     if sense_dict.get("sdsense"):
                         sense_divider = sense_dict["sdsense"]["sd"]# something like "specifically" or "also"
                         for component in sense_dict["sdsense"]["dt"]:
@@ -473,6 +428,46 @@ def extract_webster_data(webster_top_level_list):
                 etymology = clean_webster_text(component[1])
 
     return clean_webster_text(definition_str), clean_webster_text(synonyms_str), clean_webster_text(examples_str), clean_webster_text(etymology)
+
+def get_status_label_string_from_sense_dict(sense_dict):
+    status_labels_str = ""
+    status_labels_list = sense_dict.get("sls")
+    if status_labels_list:
+        status_labels_str = ", ".join(status_labels_list)
+        status_labels_str = f"[{status_labels_str}] "
+    return status_labels_str
+
+def get_example_str_from_example_dicts_list(example_dicts_list):
+    examples_to_extend = []
+    for example_dict in example_dicts_list:
+        author = ""
+        author_dict = example_dict.get("aq")
+        if author_dict:
+            author = clean_webster_text(author_dict.get("auth", ""))
+            if author != "":
+                author = f" ({author})"
+        example_str = clean_webster_text(example_dict["t"]) + author
+        examples_to_extend.append(example_str)
+    
+    return examples_to_extend
+
+def get_called_also_text_str_from_ca_dict(ca_dict):
+    called_also_text_dicts_list = ca_dict["cats"]
+    called_also_text_list = []
+    for called_also_text_dict in called_also_text_dicts_list:
+        called_also_text_list.append(called_also_text_dict["cat"])
+    called_also_text_str = ", ".join(called_also_text_list)
+    called_also_text_str = clean_webster_text(called_also_text_str)
+    called_also_text_str = ", also called " + called_also_text_str
+
+    return called_also_text_str
+
+def get_usage_note_from_uns_list(uns_list):
+    for uns_component in uns_list[0]:
+        if uns_component[0] == "text":
+            usage_note = clean_webster_text(uns_component[1])
+            break
+    return usage_note
 
 def clean_webster_text(raw_str):
     cleaned_str = raw_str
