@@ -435,9 +435,7 @@ def get_example_str_from_example_dicts_list(example_dicts_list):
     examples_to_extend = []
     for example_dict in example_dicts_list:
         author_source_date = ""
-        print(f"author_source_date: {author_source_date}")
         author_dict = example_dict.get("aq")
-        print(author_dict)
         if author_dict:
             author = clean_webster_text(author_dict.get("auth"))
             source = clean_webster_text(author_dict.get("source"))
@@ -448,11 +446,9 @@ def get_example_str_from_example_dicts_list(example_dicts_list):
             elif source:
                 author_and_source = f"-{source}"
             else:
-                print(f"author_source_date: {author_source_date}")
                 continue
             date = clean_webster_text(author_dict.get("aqdate"))
             author_source_date = f" {author_and_source}"
-            
             if date:
                 author_source_date += f" ({date})"
         example_str = clean_webster_text(example_dict["t"]) + author_source_date
@@ -479,6 +475,8 @@ def get_usage_note_from_uns_list(uns_list):
     return usage_note
 
 def clean_webster_text(raw_str):
+    if not raw_str:
+        return raw_str
     cleaned_str = raw_str
     tokens_to_remove_but_keep_text_between_tokens = ["{b}", "{/b}", "{bc}", "{inf}", "{/inf}", "{it}", "{/it}", "{ldquo}", "{rdquo}", "{sc}", "{/sc}", "{sup}", "{wi}", "{/wi}", "{parahw}", "{/parahw}", "{phrase}", "{/phrase}", "{qword}", "{/qword}", "{mat}"]
     # examples include: absence
