@@ -348,12 +348,15 @@ def extract_webster_data(webster_top_level_list):
                     status_labels_str = get_status_label_string_from_sense_dict(sense_dict)
                     for component in sense_definition_text_list:
                         if component[0] == "text":
-                            if bs_this_sense:# if this subsense follows a "bs" within the same sense. examples include feline, chary. chary has some subsenses that follow a "bs" in the same sense, and also some that follow it in a separate sense)
+                            if bs_this_sense:# if this subsense follows a "bs" within the same sense. examples include feline, chary, crunch. chary has some subsenses that follow a "bs" in the same sense, and also some that follow it in a separate sense)
                                 bsseq_num_str = sense_dict.get("sn", "")
                                 bsseq_num_str = f" ({bsseq_num_str}) "
                                 if not bs_this_subsense:# if a previous subsense followed a "bs", but now this one is not part of the "bs" sequence. examples include: chary
                                     definitions_this_sense_str += "; " + status_labels_str + clean_webster_text(component[1])
                                 else:
+                                    print("HERE")
+                                    print(component[1])
+                                    print(clean_webster_text(component[1]))
                                     definitions_this_sense_str += bsseq_num_str + status_labels_str + clean_webster_text(component[1])
                             else:# examples include: monitor
                                 definitions_this_sense_str += status_labels_str + clean_webster_text(component[1])
@@ -536,8 +539,7 @@ def clean_webster_text(raw_str):
     cleaned_str = misc_helpers.strip_whitespace_and_more(cleaned_str, non_whitespace_chars_to_strip=",;:-|")
 
     #after fully cleaning, check if it starts and ends with parentheses (and only has one set), and remove them if so. this is mostly for definitions that are just "sx|"" tokens:
-    if cleaned_str.count("(") == 1 and cleaned_str.count(")") == 1 and cleaned_str[0] == "(" and cleaned_str[-1] == ")":
-        cleaned_str = cleaned_str[1:-1]
+    cleaned_str = misc_helpers.remove_parentheses_if_fully_enclosed(cleaned_str)
 
     return cleaned_str
 
