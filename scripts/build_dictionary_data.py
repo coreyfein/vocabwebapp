@@ -478,17 +478,26 @@ def clean_webster_text(raw_str):
     if not raw_str:
         return raw_str
     cleaned_str = raw_str
-    tokens_to_remove_but_keep_text_between_tokens = ["{b}", "{/b}", "{bc}", "{inf}", "{/inf}", "{it}", "{/it}", "{ldquo}", "{rdquo}", "{sc}", "{/sc}", "{sup}", "{wi}", "{/wi}", "{parahw}", "{/parahw}", "{phrase}", "{/phrase}", "{qword}", "{/qword}", "{mat}"]
+    tokens_to_remove_but_keep_text_between_tokens = ["{b}", "{/b}", "{inf}", "{/inf}", "{it}", "{/it}", "{sc}", "{/sc}", "{sup}", "{wi}", "{/wi}", "{parahw}", "{/parahw}", "{phrase}", "{/phrase}", "{qword}", "{/qword}", "{mat}"]
     # examples include: absence
     # ^removing {mat} above, which only exists within {ma} tokens. Then remove text within {ma} tokens which would've otherwise included the {mat} tokens
     for token in tokens_to_remove_but_keep_text_between_tokens:
         cleaned_str = cleaned_str.replace(token, "")
         
-    tokens_to_replace_with_parentheses = ["{dx}", "{dx_def}", "{dx_ety}"]
-    for token_start in tokens_to_replace_with_parentheses:
+    token_pairs_to_replace_with_parentheses = ["{dx}", "{dx_def}", "{dx_ety}"]
+    for token_start in token_pairs_to_replace_with_parentheses:
         token_end = token_start.replace("{", "{/")
         cleaned_str = cleaned_str.replace(token_start, "(")
         cleaned_str = cleaned_str.replace(token_end, ")")
+
+    tokens_to_replace_with_chars = {
+        "{ldquo}":'"', 
+        "{rdquo}":'"',
+        "{bc}": "; "
+    }
+
+    for token in tokens_to_replace_with_chars:
+        cleaned_str = cleaned_str.replace(token, tokens_to_replace_with_chars[token])
     
     tokens_to_remove_and_remove_text_between_tokens = ["{gloss}", "{ma}"]# examples include: absence
     for token_start in tokens_to_remove_and_remove_text_between_tokens:
