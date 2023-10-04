@@ -32,9 +32,23 @@ def run(user, words_per_quiz):
                     vocab_entry_streaks[user_response.vocab_entry]["streak"] += 1
                 else:
                     vocab_entry_streaks[user_response.vocab_entry]["streak_status"] = "ended"
-    quizzed_queue_no_cap = sorted(vocab_entry_streaks, key=lambda x: (vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]))
-    # Above sorts by streak first, then most recent quiz date. that makes lower streaks first, then oldest most_recent_quiz_date. 
-    # Used to have the most_recent_quiz_date sort be newest first, which resulted in words repeating in quizzes infinitely if you get everything right.
+
+    # For negative streaks, sort by worst streaks, then LEAST recently quizzed. 
+    negative_streak_vocab_entries = list(filter(lambda x: (vocab_entry_streaks[x]["streak"] < 0), vocab_entry_streaks))
+    negative_streak_vocab_entries.sort(key=lambda x: (vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]))
+
+    # For low positive streaks, sort by worst streaks, then MORE recently quizzed words. 
+    # Being quizzed on a word again the next day after a negative streak just ended should help with retention.
+    one_to_two_streak_vocab_entries = list(filter(lambda x: (vocab_entry_streaks[x]["streak"] in [1, 2]), vocab_entry_streaks))
+    one_to_two_streak_vocab_entries.sort(key=lambda x: (-vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]), reverse=True)
+
+    # For words with 3+ positive streak, don't sort by streak -- only by most_recent_quiz_date. 
+    # This prevents new words from popping up in quizzes for too long after they're pretty well learned.
+    three_or_more_streak_vocab_entries = list(filter(lambda x: (vocab_entry_streaks[x]["streak"] >= 3), vocab_entry_streaks))
+    three_or_more_streak_vocab_entries.sort(key=lambda x: (vocab_entry_streaks[x]["most_recent_quiz_date"]))
+
+    quizzed_queue_no_cap = negative_streak_vocab_entries + one_to_two_streak_vocab_entries + three_or_more_streak_vocab_entries
+        
     if len(quizzed_queue_no_cap) >= words_per_quiz:
         quizzed_queue = quizzed_queue_no_cap[:words_per_quiz]# caps quizzed_queue at words_per_quiz if necessary
     else:
