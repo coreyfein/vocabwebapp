@@ -33,9 +33,9 @@ def run(user, words_per_quiz):
                 else:
                     vocab_entry_streaks[user_response.vocab_entry]["streak_status"] = "ended"
 
-    # For negative streaks, sort by worst streaks, then LEAST recently quizzed. 
+    # For negative streaks, sort by worst streaks, then MORE recently quizzed. 
     negative_streak_vocab_entries = list(filter(lambda x: (vocab_entry_streaks[x]["streak"] < 0), vocab_entry_streaks))
-    negative_streak_vocab_entries.sort(key=lambda x: (vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]))
+    negative_streak_vocab_entries.sort(key=lambda x: (-vocab_entry_streaks[x]["streak"], vocab_entry_streaks[x]["most_recent_quiz_date"]), reverse=True)
 
     # For low positive streaks, sort by worst streaks, then MORE recently quizzed words. 
     # Being quizzed on a word again the next day after a negative streak just ended should help with retention.
