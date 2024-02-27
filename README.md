@@ -10,5 +10,8 @@ When you quiz yourself here, your answers (either correct or incorrect) are stor
 
 # Documentation
 
-Webster API Documentation can be found here: https://dictionaryapi.com/products/json
+For details on the app's functionality/logic, see [coreyfein.com/vocab-for-readers](https://coreyfein.com/vocab-for-readers)
+
+Webster API documentation can be found here: https://dictionaryapi.com/products/json
 Some other notes on Webster definitions can be found here: https://www.merriam-webster.com/help/explanatory-notes/dict-definitions
+WordsAPI documentation can be found here: https://rapidapi.com/dpventures/api/wordsapi
