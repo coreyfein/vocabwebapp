@@ -7,6 +7,7 @@
   <h1>Vocab List</h1>
   <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
   <p><a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a vocab list</a></p>
+  <p><a href="{% url 'simplevocab:vocab_list_export' %}" download>Export your vocab list</a></p>
   {% if vocabentry_list %}
   <table>
     <tr>
@@ -82,4 +83,6 @@
     <p>There are no vocab entries for this user.</p>
   {% endif %}
 </div>
+</br>
+</br>
 {% endblock %}

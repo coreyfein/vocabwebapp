@@ -6,9 +6,42 @@ from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from scripts import add_vocabentry, create_quiz_queue, add_quizresponses, get_response_stats
 import csv
 from io import TextIOWrapper
+
+@login_required
+def vocab_entry_export(request):
+    csv_export = HttpResponse(content_type='text/csv')
+    csv_export['Content-Disposition'] = 'attachment; filename="vocab_list.csv"'
+    writer = csv.writer(csv_export)
+    writer.writerow(['word', 'discovery_source', 'discovery_context', 'definition', 'synonyms', 'examples', 'etymology'])
+    vocab_entries = VocabEntry.objects.filter(user=request.user.id).order_by("-created_at")
+    for vocab_entry in vocab_entries:
+        word = vocab_entry.word.word
+        if vocab_entry.definition_override and vocab_entry.definition_override != "":
+            definition = vocab_entry.definition_override
+        else:
+            definition = vocab_entry.word.definition
+        if vocab_entry.synonyms_override and vocab_entry.synonyms_override != "":
+            synonyms = vocab_entry.synonyms_override
+        else:
+            synonyms = vocab_entry.word.synonyms
+        if vocab_entry.examples_override and vocab_entry.examples_override != "":
+            examples = vocab_entry.examples_override
+        else:
+            examples = vocab_entry.word.examples
+        if vocab_entry.etymology_override and vocab_entry.etymology_override != "":
+            etymology = vocab_entry.etymology_override
+        else:
+            etymology = vocab_entry.word.etymology
+        discovery_source = vocab_entry.discovery_source
+        discovery_context = vocab_entry.discovery_context
+        row = [word, discovery_source, discovery_context, definition, synonyms, examples, etymology]
+        writer.writerow(row)
+    return csv_export
 
 class VocabEntryListView(OwnerListView):
     model = VocabEntry
@@ -103,7 +136,7 @@ class VocabListUploadView(LoginRequiredMixin, FormView):
             synonyms_override = item.get("synonyms")
             examples_override = item.get("examples")
             etymology_override = item.get("etymology")
-            word_found_in_dictionary, vocab_entry_already_existed_for_word = add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
+            vocab_entry_id, word_found_in_dictionary, vocab_entry_already_existed_for_word = add_vocabentry.run(word, discovery_source, discovery_context, user, definition_override, synonyms_override, examples_override, etymology_override)
             if not word_found_in_dictionary:
                 words_not_found_in_dictionary.append((word))
             if vocab_entry_already_existed_for_word:

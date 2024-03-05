@@ -14,6 +14,8 @@ urlpatterns = [
         views.VocabEntryCreateView.as_view(), name='vocabentry_create'),#success_url set in view to vocabentry_detail for the pk of newly created vocabentry
     path('upload',
         views.VocabListUploadView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='vocab_list_upload'),
+    path('export',
+        views.vocab_entry_export, name='vocab_list_export'),
     path('quiz',
         views.QuizSubmitView.as_view(success_url=reverse_lazy('simplevocab:all_vocabentries')), name='quiz'),    
 ]
