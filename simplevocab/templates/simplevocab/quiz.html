@@ -13,7 +13,10 @@
         </h4>
         <p>If you want to quickly see how the quiz and other features work with a full vocab list, just head over to the
             <a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a Word</a> page, download the template, and then upload that file to your vocab list. 
-            If you prefer to add your own words, just edit the template before uploading it.
+        </p>
+        <p>
+            If you prefer to add your own words, you can edit the template before uploading it to that page, 
+            or you can add individual words <a href="{% url 'simplevocab:vocabentry_create' %}">here</a>.
         </p>
     {% else %}
         {% for field in form %}
