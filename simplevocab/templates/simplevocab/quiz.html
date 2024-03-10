@@ -15,33 +15,36 @@
             <a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a Word</a> page, download the template, and then upload that file to your vocab list. 
             If you prefer to add your own words, just edit the template before uploading it.
         </p>
-    {% endif %}
-    {% for field in form %}
-        {% for vocab_entry_dict in vocabentries_to_quiz %}
-            {% if vocab_entry_dict.field_name == field.name %}
-            <h4>{{vocab_entry_dict.vocab_entry.word}}</h4>
-            <div id="{{vocab_entry_dict.vocab_entry.word}}" style="display: none">
-                <p><strong>Definition:</strong> {{vocab_entry_dict.definition|linebreaks}}</br>
-                <strong>Synonyms:</strong> {{vocab_entry_dict.synonyms|linebreaks}}</br>
-                <strong>Examples:</strong> {{vocab_entry_dict.examples|linebreaks}}</br>
-                <strong>Etymology:</strong> {{vocab_entry_dict.etymology|linebreaks}}</br>
-                <strong>Discovery Source:</strong> {{vocab_entry_dict.discovery_source|linebreaks}}</br>
-                <strong>Discovery Context:</strong> {{vocab_entry_dict.discovery_context|linebreaks}}</p>
-            </div>
-            <script type="text/javascript" 
-                    src="{% static 'simplevocab/display_word_data.js' %}">
-            </script>
-            <a id="a-{{vocab_entry_dict.vocab_entry.word}}" href="javascript:void(0)" onclick="displayWordData('{{vocab_entry_dict.vocab_entry.word}}'); return false;">Show Word Details</a>
-            {{ form.errors }}
-            {{ field }}
-            <br/>
-            <br/>
-            {% endif %}
+    {% else %}
+        {% for field in form %}
+            {% for vocab_entry_dict in vocabentries_to_quiz %}
+                {% if vocab_entry_dict.field_name == field.name %}
+                <h4>{{vocab_entry_dict.vocab_entry.word}}</h4>
+                <div id="{{vocab_entry_dict.vocab_entry.word}}" style="display: none">
+                    <p><strong>Definition:</strong> {{vocab_entry_dict.definition|linebreaks}}</br>
+                    <strong>Synonyms:</strong> {{vocab_entry_dict.synonyms|linebreaks}}</br>
+                    <strong>Examples:</strong> {{vocab_entry_dict.examples|linebreaks}}</br>
+                    <strong>Etymology:</strong> {{vocab_entry_dict.etymology|linebreaks}}</br>
+                    <strong>Discovery Source:</strong> {{vocab_entry_dict.discovery_source|linebreaks}}</br>
+                    <strong>Discovery Context:</strong> {{vocab_entry_dict.discovery_context|linebreaks}}</p>
+                </div>
+                <script type="text/javascript" 
+                        src="{% static 'simplevocab/display_word_data.js' %}">
+                </script>
+                <a id="a-{{vocab_entry_dict.vocab_entry.word}}" href="javascript:void(0)" onclick="displayWordData('{{vocab_entry_dict.vocab_entry.word}}'); return false;">Show Word Details</a>
+                {{ form.errors }}
+                {{ field }}
+                <br/>
+                <br/>
+                {% endif %}
+            {% endfor %}
+            
         {% endfor %}
-        
-    {% endfor %}
-    <input type="submit" value="Submit Quiz">
-    <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
+        <input type="submit" value="Submit Quiz">
+        <input type="submit" onclick="window.location='{% url 'simplevocab:all_vocabentries' %}' ; return false;" value="Cancel">
+    {% endif %}
+    </br>
+    </br>
 </form>
 </div>
 {% endblock %}
