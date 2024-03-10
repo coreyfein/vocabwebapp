@@ -4,83 +4,94 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'simplevocab/style.css' %}">
 <div class="container">
-  <h1>Vocab List</h1>
-  <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
-  <p><a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a vocab list</a></p>
-  <p><a href="{% url 'simplevocab:vocab_list_export' %}" download>Export your vocab list</a></p>
   {% if vocabentry_list %}
-  <table>
-    <tr>
-      <th min-width="150px"; width="auto">Word</th>
-      <th width="100px">% Correct</th>
-      <th width="80px">Last 10</th>
-      <th width="120px">Streak</th>
-      <th width="600px">Discovery Source</th>
-    </tr>
-    {% for word, subword in response_stats.items %}
-    <tr> 
-      <td>  
-        {% for vocabentry in vocabentry_list %}
-          {% if vocabentry.word.word == word %}
-            {{word}}
-            (<a href="{% url 'simplevocab:vocabentry_detail' vocabentry.id %}">View</a> |
-            <a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update</a> |
-            <a href="{% url 'simplevocab:vocabentry_delete' vocabentry.id %}">Delete</a>)
-          {% endif %}
-        {% endfor %}
-      </td>
-      <td>
-        {% for subword, stats in subword.items %}
-          {% if subword == "all_time" %}
-            {% for stat, value in stats.items %}
-              {% if stat == "percent_correct" %}
-                {{ value }}%
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-      </td>
-      <td>
-        {% for subword, stats in subword.items %}
-          {% if subword == "last_ten" %}
-            {% for stat, value in stats.items %}
-              {% if stat == "correct" %}
-                {{ value }} /
-              {% endif %}
-            {% endfor %}
-            {% for stat, value in stats.items %}
-              {% if stat == "total" %}
-                {{ value }}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-      </td>
-      <td>
-        {% for subword, value in subword.items %}
-          {% if subword == "streak" %}  
-            {% if value < 0 %}
-              {{ value | abs}} Incorrect
-            {% elif value > 0 %}
-              {{ value | abs}} Correct
-            {% else %}
-              Not yet quizzed
+    <h1>Vocab List</h1>
+    <p><a href="{% url 'simplevocab:vocabentry_create' %}">Add a new word</a></p>
+    <p><a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a vocab list</a></p>
+    <p><a href="{% url 'simplevocab:vocab_list_export' %}" download>Export your vocab list</a></p>
+    
+    <table>
+      <tr>
+        <th min-width="150px"; width="auto">Word</th>
+        <th width="100px">% Correct</th>
+        <th width="80px">Last 10</th>
+        <th width="120px">Streak</th>
+        <th width="600px">Discovery Source</th>
+      </tr>
+      {% for word, subword in response_stats.items %}
+      <tr> 
+        <td>  
+          {% for vocabentry in vocabentry_list %}
+            {% if vocabentry.word.word == word %}
+              {{word}}
+              (<a href="{% url 'simplevocab:vocabentry_detail' vocabentry.id %}">View</a> |
+              <a href="{% url 'simplevocab:vocabentry_update' vocabentry.id %}">Update</a> |
+              <a href="{% url 'simplevocab:vocabentry_delete' vocabentry.id %}">Delete</a>)
             {% endif %}
-          {% endif %}
-        {% endfor %}
-      </td>
-      <td>
-        {% for subword, value in subword.items %}
-          {% if subword == "discovery_source" %}  
-            {{ value }}
-          {% endif %}
-        {% endfor %}
-      </td>        
-    </tr>
-    {% endfor %}         
-  </table>
+          {% endfor %}
+        </td>
+        <td>
+          {% for subword, stats in subword.items %}
+            {% if subword == "all_time" %}
+              {% for stat, value in stats.items %}
+                {% if stat == "percent_correct" %}
+                  {{ value }}%
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% for subword, stats in subword.items %}
+            {% if subword == "last_ten" %}
+              {% for stat, value in stats.items %}
+                {% if stat == "correct" %}
+                  {{ value }} /
+                {% endif %}
+              {% endfor %}
+              {% for stat, value in stats.items %}
+                {% if stat == "total" %}
+                  {{ value }}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% for subword, value in subword.items %}
+            {% if subword == "streak" %}  
+              {% if value < 0 %}
+                {{ value | abs}} Incorrect
+              {% elif value > 0 %}
+                {{ value | abs}} Correct
+              {% else %}
+                Not yet quizzed
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% for subword, value in subword.items %}
+            {% if subword == "discovery_source" %}  
+              {{ value }}
+            {% endif %}
+          {% endfor %}
+        </td>        
+      </tr>
+      {% endfor %}         
+    </table>
   {% else %}
-    <p>There are no vocab entries for this user.</p>
+    <h4>
+      You don't have any words in your vocab list. 
+    </h4>
+    <p>If you want to quickly see how the quiz and other features work with a full vocab list, just head over to the
+        <a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a Word</a> page, download the template, and then upload that file to your vocab list. 
+    </p>
+    <p>
+      If you prefer to add your own words, you can edit the template before uploading it to that page, 
+      or you can add individual words <a href="{% url 'simplevocab:vocabentry_create' %}">here</a>.
+    </p>
+    
   {% endif %}
 </div>
 </br>
