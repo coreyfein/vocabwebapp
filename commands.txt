@@ -1,0 +1,44 @@
+First time building (?) the container: 
+docker compose run django django-admin startproject vocabwebapp .
+
+(If starting over, after running that again, may need to do docker compose down and then docker compose up afterwards to clear the error)
+
+After the first time, just do:
+docker compose up 
+
+To shut down the container:
+
+In the Terminal where you did docker compose up, do ctrl+c to stop, and then:
+
+docker compose down
+
+To go into a bash instance within the Django conatiner:
+docker exec -it vocabwebapp_django bash
+
+Then migrate if needed:
+python manage.py migrate --run-syncdb
+
+OR 
+
+To run something (like migrate) in the Django container without going into it first:
+docker compose run django python manage.py migrate --run-syncdb
+
+
+
+Create a superuser:
+python manage.py createsuperuser
+
+Load db data:
+python manage.py loaddata datadump_2024-03-08.json 
+
+
+Postgres
+==========
+
+To go into the postgres db in Terminal:
+docker exec -it pgdb psql -U postgres
+
+\c <database_name>
+\d
+\d+ <table_name>
+\q
