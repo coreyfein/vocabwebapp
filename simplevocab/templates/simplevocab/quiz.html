@@ -8,6 +8,15 @@
 <form action="" method="post">
     {% csrf_token %}
     {% for field in form %}
+        {% if vocabentries_to_quiz|length < 1 %}
+            <h4>
+                You don't have any words in your vocab list. 
+            </h4>
+            <p>If you want to quickly see how the quiz and other features work with a full vocab list, just head over to the
+                <a href="{% url 'simplevocab:vocab_list_upload' %}">Upload a Word</a> page, download the template, and then upload that file to your vocab list. 
+                If you prefer to add your own words, just edit the template before uploading it.
+            </p>
+        {% endif %}
         {% for vocab_entry_dict in vocabentries_to_quiz %}
             {% if vocab_entry_dict.field_name == field.name %}
             <h4>{{vocab_entry_dict.vocab_entry.word}}</h4>
@@ -21,7 +30,6 @@
             </div>
             <script type="text/javascript" 
                     src="{% static 'simplevocab/display_word_data.js' %}">
-            </script><!-- remember to update STATIC_ROOT when deploying: https://docs.djangoproject.com/en/4.2/howto/static-files/ -->
             <a id="a-{{vocab_entry_dict.vocab_entry.word}}" href="javascript:void(0)" onclick="displayWordData('{{vocab_entry_dict.vocab_entry.word}}'); return false;">Show Word Details</a>
             {{ form.errors }}
             {{ field }}
