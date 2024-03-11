@@ -1,6 +1,20 @@
 # version: 
 
 services:
+    redis:
+        image: redis:alpine
+        container_name: redis    
+    
+    pgdb:
+        image: postgres
+        container_name: pgdb
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        volumes:
+            - pgdata:/var/lib/postgresql/data  
+    
     django:
         build: .
         container_name: vocabwebapp_django
@@ -11,14 +25,5 @@ services:
             - "8000:8000"
         depends_on:
             - pgdb
-    pgdb:
-        image: postgres
-        container_name: pgdb
-        environment:
-            - POSTGRES_DB=postgres
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
-        volumes:
-            - pgdata:/var/lib/postgresql/data
 volumes:
     pgdata:

@@ -1,5 +1,5 @@
 First time building (?) the container: 
-docker compose run django django-admin startproject vocabwebapp .
+docker compose build
 
 (If starting over, after running that again, may need to do docker compose down and then docker compose up afterwards to clear the error)
 
@@ -14,6 +14,8 @@ docker compose down
 
 To go into a bash instance within the Django conatiner:
 docker exec -it vocabwebapp_django bash
+OR
+docker exec -it vocabwebapp_django sh
 
 Then migrate if needed:
 python manage.py migrate --run-syncdb
